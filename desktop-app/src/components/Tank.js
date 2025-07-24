@@ -4,25 +4,34 @@ function Tank({ tag, level }) {
   const tankContainer = {
     width: '150px',
     height: '400px',
-    border: '4px solid #555',
-    borderRadius: '10px',
-    overflow: 'hidden',
-    backgroundColor: '#333',
-    position: 'relative'
+    borderRadius: '20px',
+    backgroundColor: '#111',
+    boxShadow: '0 0 20px #00f, 0 0 40px #00f inset',
+    border: '2px solid #0ff',
+    position: 'relative',
+    overflow: 'hidden'
   };
 
   const fluidStyle = {
     position: 'absolute',
     bottom: 0,
+    left: 0,
     width: '100%',
     height: `${level}%`,
-    backgroundColor: '#1E90FF',
-    transition: 'height 0.5s'
+    background: 'linear-gradient(to top, #00f, #00f)',
+    boxShadow: '0 0 10px #00f'
+  };
+
+  const tagStyle = {
+    textAlign: 'center',
+    marginBottom: '10px',
+    color: '#0ff',
+    textShadow: '0 0 5px #0ff'
   };
 
   return (
     <div style={{ textAlign: 'center' }}>
-      <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>{tag}</div>
+      <div style={tagStyle}>{tag}</div>
       <div style={tankContainer}>
         <div style={fluidStyle}></div>
       </div>

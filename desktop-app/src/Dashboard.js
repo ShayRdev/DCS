@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import Tank from './components/Tank';
-import Transmitter from './components/Transmitter';
 import Pipe from './components/Pipe';
 import PumpButton from './components/PumpButton';
+import Navbar from './components/Navbar';
+import TransmitterWithGauge from './components/TransmitterWithGauge';
 
 function Dashboard() {
   const [data, setData] = useState({
@@ -12,6 +13,9 @@ function Dashboard() {
     flow: 0,
     pumpStatus: false
   });
+
+  const tapHeightPercent = 20;
+  const visualMinFill = 8;
 
   useEffect(() => {
     const ws = new WebSocket('ws://192.168.1.125:8765');
@@ -50,38 +54,54 @@ function Dashboard() {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    backgroundColor: '#1e1e1e',
+    background: '#0a0a0a',
     minHeight: '100vh',
-    fontFamily: 'sans-serif',
+    fontFamily: 'Orbitron, Helvetica Neue, sans-serif',
     padding: '20px',
-    color: '#fff'
+    paddingTop: '50px',
+    color: '#0ff'
   };
+
+  const ltLevel = data.level < tapHeightPercent ? 0 : ((data.level - tapHeightPercent) * 27.68 / 100).toFixed(1);
+  const tankVisualLevel = Math.max(data.level, visualMinFill);
 
   return (
     <div style={containerStyle}>
+      <Navbar temperature={35} humidity={62} site="Unit 400 Tank Control" />
       <PumpButton pumpStatus={data.pumpStatus} togglePump={togglePump} />
 
-      <div style={{ display: 'flex', position: 'relative', alignItems: 'center' }}>
-        <Tank tag="T-G-122" level={data.level} />
+      <svg width="1300" height="700" style={{ backgroundColor: '#000', borderRadius: '8px' }}>
+        {/* Process pipes */}
+        <Pipe x1={200} y1={530} x2={280} y2={530} color="#0ff" glow />
+        <Pipe x1={280} y1={530} x2={280} y2={600} color="#0ff" glow />
+        <Pipe x1={280} y1={600} x2={320} y2={600} color="#0ff" glow />
 
-        {/* Pipes */}
-        <Pipe top="200px" left="180px" width="100px" height="5px" />
-        <Pipe top="200px" left="280px" width="5px" height="100px" />
+        <Pipe x1={246} y1={400} x2={350} y2={400} color="#00f" glow />
+        <Pipe x1={350} y1={400} x2={350} y2={450} color="#00f" glow />
+        <Pipe x1={350} y1={450} x2={500} y2={450} color="#f00" glow />
 
-        {/* Transmitters */}
-        <div style={{ position: 'absolute', left: '-120px', top: '400px' }}>
-          <Transmitter tag="LT-101" value={(data.level * 27.68 / 100).toFixed(1)} unit="inH₂O" />
-        </div>
-        <div style={{ position: 'absolute', left: '320px', top: '120px' }}>
-          <Transmitter tag="PT-102" value={data.pressure} unit="psi" />
-        </div>
-        <div style={{ position: 'absolute', left: '320px', top: '220px' }}>
-          <Transmitter tag="TT-103" value={data.temperature.toFixed(1)} unit="°C" />
-        </div>
-        <div style={{ position: 'absolute', left: '320px', top: '320px' }}>
-          <Transmitter tag="FT-104" value={data.flow} unit="gpm" />
-        </div>
-      </div>
+        {/* Tank */}
+        <foreignObject x="50" y="130" width="160" height="470">
+          <Tank tag="T-G-122" level={tankVisualLevel} />
+        </foreignObject>
+
+        {/* Transmitters with new futuristic UI */}
+        <foreignObject x="550" y="150" width="400" height="120">
+          <TransmitterWithGauge tag="PT-102" value={data.pressure} unit="psi" min={0} max={30} />
+        </foreignObject>
+
+        <foreignObject x="550" y="280" width="400" height="120">
+          <TransmitterWithGauge tag="TT-103" value={data.temperature.toFixed(1)} unit="°C" min={0} max={100} />
+        </foreignObject>
+
+        <foreignObject x="550" y="410" width="400" height="120">
+          <TransmitterWithGauge tag="FT-104" value={data.flow} unit="gpm" min={0} max={100} />
+        </foreignObject>
+
+        <foreignObject x="320" y="550" width="400" height="120">
+          <TransmitterWithGauge tag="LT-101" value={ltLevel} unit="inH₂O" min={0} max={30} />
+        </foreignObject>
+      </svg>
     </div>
   );
 }

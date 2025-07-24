@@ -2,25 +2,22 @@ import React from 'react';
 
 function PumpButton({ pumpStatus, togglePump }) {
   const buttonStyle = {
+    backgroundColor: '#007aff',
+    border: 'none',
+    borderRadius: '10px',
+    color: '#fff',
     padding: '10px 20px',
     fontSize: '16px',
-    backgroundColor: '#333',
-    color: '#fff',
-    border: '2px solid #555',
-    borderRadius: '5px',
     cursor: 'pointer',
-    marginBottom: '10px'
+    boxShadow: '0 4px 20px rgba(0,122,255,0.4)',
+    fontFamily: 'Helvetica Neue, sans-serif',
+    marginBottom: '20px'
   };
 
   return (
-    <div style={{ textAlign: 'center' }}>
-      <button onClick={togglePump} style={buttonStyle}>
-        {pumpStatus ? "Stop Pump" : "Start Pump"}
-      </button>
-      <div style={{ fontSize: '16px', marginTop: '10px' }}>
-        <strong>Pump Status:</strong> {pumpStatus ? "ON" : "OFF"}
-      </div>
-    </div>
+    <button style={buttonStyle} onClick={togglePump}>
+      {pumpStatus ? 'Stop Pump' : 'Start Pump'}
+    </button>
   );
 }
 
