@@ -89,7 +89,7 @@ export function useDcsConnections({ onRelayMessage, onStatsMessage } = {}) {
       relayRef.current?.stop();
       statsRef.current?.stop();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line
   }, []);
 
   const connectNow = () => {
@@ -99,7 +99,8 @@ export function useDcsConnections({ onRelayMessage, onStatsMessage } = {}) {
     statsRef.current?.poke();
   };
 
-  const sendRelay = (data) => relayRef.current?.send(data);
+  const sendRelay = (data) =>
+    relayRef.current ? relayRef.current.send(data) : false;
 
   return {
     connected: relayConnected && statsConnected,

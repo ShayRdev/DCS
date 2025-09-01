@@ -8,8 +8,8 @@
     "react-scripts": "5.0.1"
   },
   "devDependencies": {
-    "electron": "^29.0.0",
     "concurrently": "^8.2.0",
+    "electron": "^29.0.0",
     "wait-on": "^7.0.1"
   },
   "scripts": {
@@ -27,6 +27,12 @@
       "last 1 chrome version",
       "last 1 firefox version",
       "last 1 safari version"
+    ]
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
     ]
   }
 }
