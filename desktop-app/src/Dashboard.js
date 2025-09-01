@@ -1,7 +1,8 @@
 // DCSDashboard.jsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import SystemStatsCard from "./components/SystemStatsCard";
-import LogViewer from "./components/LogViewer";
+import PumpControls from "./components/PumpControls";
+import PumpLogsModal from "./components/PumpLogsModal";
 
 /** ======== CONFIG ======== */
 const WS_URL = "ws://192.168.1.125:8765"; // <-- change if your Pi IP changes
@@ -96,15 +97,6 @@ const btn = (active, danger = false) => ({
     : "0 0 0 2px rgba(255,255,255,0.04) inset",
 });
 
-const lamp = (on, colorOn, colorOff = "#3a3f45") => ({
-  width: 12,
-  height: 12,
-  borderRadius: 12,
-  background: on ? colorOn : colorOff,
-  boxShadow: on ? `0 0 10px ${colorOn}` : "none",
-  border: "1px solid #000",
-});
-
 /** ======== SIMPLE INSTRUMENT PANEL ======== */
 function PV({ tag, value, unit, min = 0, max = 100, alarmHi, alarmLo }) {
   const pct = Math.max(0, Math.min(100, ((value - min) * 100) / (max - min)));
@@ -178,6 +170,9 @@ export default function DCSDashboard() {
 
   const [sys, setSys] = useState(null);
   const [logs, setLogs] = useState([]);
+  const [showPumpLogs, setShowPumpLogs] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const [serviceActive, setServiceActive] = useState('inactive');
 
   // PVs
   const [level, setLevel] = useState(35);
@@ -243,7 +238,12 @@ export default function DCSDashboard() {
 
     wsStats.onmessage = (e) => {
       let msg; try { msg = JSON.parse(e.data); } catch { return; }
-      if (msg.type === "metrics") setSys(msg.data);
+      if (msg.type === "metrics") {
+        setSys(msg.data);
+        if (msg.data && msg.data.service && typeof msg.data.service.active !== 'undefined') {
+          setServiceActive(msg.data.service.active);
+        }
+      }
       if (msg.type === "log") setLogs(prev => [...prev, msg.line].slice(-200));
       if (msg.type === "log_init") setLogs(msg.lines.slice(-200));
     };
@@ -272,6 +272,7 @@ export default function DCSDashboard() {
   /** ----- Pump buttons ----- */
   const handleRun  = () => { unlockAudio(); if (!pump) { sendPump(true);  setPump(true);  } };
   const handleStop = () => { unlockAudio(); if (pump)  { sendPump(false); setPump(false); } };
+  const handleClearLogs = () => setLogs([]);
 
   /** ----- Process simulation ----- */
   useEffect(() => {
@@ -351,19 +352,12 @@ export default function DCSDashboard() {
 
       {/* Left: Controls */}
       <div style={leftPanel}>
-        <div>
-          <div style={sectionTitle}>Pump Controls</div>
-          <div style={{ display: "grid", gap: 10 }}>
-            <button style={btn(pump)} onClick={handleRun} disabled={pump}>
-              <span style={lamp(pump, "#2bd673")} />
-              RUN P-101
-            </button>
-            <button style={btn(false, true)} onClick={handleStop} disabled={!pump}>
-              <span style={lamp(!pump, "#e04f4f")} />
-              STOP P-101
-            </button>
-          </div>
-        </div>
+        <PumpControls
+          pump={pump}
+          onRun={handleRun}
+          onStop={handleStop}
+          onShowLogs={() => setShowPumpLogs(true)}
+        />
 
         <div>
           <div style={sectionTitle}>Connection</div>
@@ -393,7 +387,6 @@ export default function DCSDashboard() {
         <PV tag="FT-104" value={flow}  unit="gpm" min={0} max={100} />
         <PV tag="PT-102" value={press} unit="psi" min={0} max={30} />
         <PV tag="TT-103" value={temp}  unit="°C"  min={0} max={100} />
-        <LogViewer lines={logs} />
       </div>
 
       {/* Bottom: Alarms + ACK (snooze) */}
@@ -426,6 +419,16 @@ export default function DCSDashboard() {
           <div style={{ color: "#7fffb2" }}>NO ACTIVE ALARMS</div>
         )}
       </div>
+
+      <PumpLogsModal
+        isOpen={showPumpLogs}
+        onClose={() => setShowPumpLogs(false)}
+        logs={logs}
+        onClear={handleClearLogs}
+        paused={paused}
+        onPauseToggle={() => setPaused((p) => !p)}
+        serviceActive={serviceActive}
+      />
     </div>
   );
 }
