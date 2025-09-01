@@ -1,5 +1,7 @@
 // DCSDashboard.jsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import SystemStatsCard from "./components/SystemStatsCard";
+import LogViewer from "./components/LogViewer";
 
 /** ======== CONFIG ======== */
 const WS_URL = "ws://192.168.1.125:8765"; // <-- change if your Pi IP changes
@@ -183,6 +185,9 @@ export default function DCSDashboard() {
   const [connOK, setConnOK] = useState(false);
   const [pump, setPump]   = useState(false);
 
+  const [sys, setSys] = useState(null);
+  const [logs, setLogs] = useState([]);
+
   // PVs
   const [level, setLevel] = useState(35);
   const [flow,  setFlow]  = useState(0);
@@ -219,6 +224,9 @@ export default function DCSDashboard() {
           const msg = JSON.parse(ev.data);
           if (msg.pump === "on") setPump(true);
           if (msg.pump === "off") setPump(false);
+          if (msg.type === "metrics") setSys(msg.data);
+          if (msg.type === "log") setLogs(prev => [...prev, msg.line].slice(-200));
+          if (msg.type === "log_init") setLogs(msg.lines.slice(-200));
         } catch {/* ignore */}
       };
 
@@ -363,6 +371,8 @@ export default function DCSDashboard() {
             </span></div>
           </div>
         </div>
+
+        <SystemStatsCard stats={sys} />
       </div>
 
       {/* Main: Process Graphic */}
@@ -380,6 +390,7 @@ export default function DCSDashboard() {
         <PV tag="FT-104" value={flow}  unit="gpm" min={0} max={100} />
         <PV tag="PT-102" value={press} unit="psi" min={0} max={30} />
         <PV tag="TT-103" value={temp}  unit="°C"  min={0} max={100} />
+        <LogViewer lines={logs} onClear={() => setLogs([])} />
       </div>
 
       {/* Bottom: Alarms + ACK (snooze) */}
