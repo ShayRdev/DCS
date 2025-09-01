@@ -34,23 +34,26 @@ import asyncio
 import json
 import time
 from collections import deque
-from typing import Deque, Set
+from typing import Deque, Set, Optional, List
 
 import psutil
 import websockets
 
+# ---- Config ----
 PORT = 8770
 SERVICE = "tankpi.service"
 LOG_MAX = 200
 LOG_BATCH_MS = 150
 METRICS_PERIOD = 5
 
+# ---- State ----
 CONNECTED: Set[websockets.WebSocketServerProtocol] = set()
 LOG_BUFFER: Deque[str] = deque(maxlen=LOG_MAX)
-FOLLOW_TASK: asyncio.Task | None = None
+FOLLOW_TASK: Optional[asyncio.Task] = None
 
 
-async def get_cpu_temp() -> float | None:
+# ---- Helpers ----
+async def get_cpu_temp() -> Optional[float]:
     path = "/sys/class/thermal/thermal_zone0/temp"
     try:
         with open(path) as f:
@@ -91,18 +94,18 @@ async def gather_metrics() -> dict:
     }
 
 
+# ---- Broadcast ----
 async def broadcast(message: str) -> None:
     if not CONNECTED:
         return
     webs = list(CONNECTED)
-    results = await asyncio.gather(
-        *(ws.send(message) for ws in webs), return_exceptions=True
-    )
+    results = await asyncio.gather(*(ws.send(message) for ws in webs), return_exceptions=True)
     for ws, res in zip(webs, results):
         if isinstance(res, Exception):
             CONNECTED.discard(ws)
 
 
+# ---- Publishers ----
 async def metrics_publisher() -> None:
     while True:
         data = await gather_metrics()
@@ -143,8 +146,8 @@ async def follow_journal() -> None:
         proc = await asyncio.create_subprocess_exec(
             *cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
         )
-        batch: list[str] = []
-        flush_task: asyncio.Task | None = None
+        batch: List[str] = []
+        flush_task: Optional[asyncio.Task] = None
 
         async def flush() -> None:
             nonlocal batch, flush_task
@@ -162,9 +165,7 @@ async def follow_journal() -> None:
                 LOG_BUFFER.append(text)
                 batch.append(text)
                 if flush_task is None:
-                    flush_task = asyncio.create_task(
-                        asyncio.sleep(LOG_BATCH_MS / 1000)
-                    )
+                    flush_task = asyncio.create_task(asyncio.sleep(LOG_BATCH_MS / 1000.0))
                     flush_task.add_done_callback(lambda t: asyncio.create_task(flush()))
         except asyncio.CancelledError:
             if flush_task is not None:
@@ -186,6 +187,7 @@ async def follow_journal() -> None:
         await asyncio.sleep(1)
 
 
+# ---- WS Handler & Main ----
 async def handler(ws: websockets.WebSocketServerProtocol) -> None:
     CONNECTED.add(ws)
     try:
