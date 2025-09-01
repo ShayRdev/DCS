@@ -5,7 +5,7 @@ const labels = {
   NOT_CONFIGURED: "Not configured",
   CONNECTING: "Connecting",
   CONNECTED: "Connected",
-  DEGRADED: "Connected (no recent data)",
+  DEGRADED: "Connected (no data >10s)",
   OFFLINE: "Offline",
   ERROR: "Error",
 };
@@ -23,8 +23,7 @@ export default function ConnBadge({ state, latencyMs }) {
 
   const color = colors[state] || "#848e9a";
   const label = labels[state] || state;
-  const showLatency =
-    latencyMs != null && (state === "CONNECTED" || state === "DEGRADED");
+  const showLatency = latencyMs != null && state === "CONNECTED";
 
   return (
     <div

@@ -171,6 +171,7 @@ export default function DCSDashboard() {
 
   const [sys, setSys] = useState(null);
   const [logs, setLogs] = useState([]);
+  const pendingLogsRef = useRef([]);
   const [showPumpLogs, setShowPumpLogs] = useState(false);
   const [paused, setPaused] = useState(false);
   const [serviceActive, setServiceActive] = useState('inactive');
@@ -195,6 +196,10 @@ export default function DCSDashboard() {
   const pumpConn = useWsConnection(PUMP_WS_URL, handlePumpMessage);
   const connOK = pumpConn.state === "CONNECTED" || pumpConn.state === "DEGRADED";
 
+  const enqueueLogs = useCallback((lines) => {
+    pendingLogsRef.current.push(...lines);
+  }, []);
+
   useEffect(() => {
     const wsStats = new WebSocket('ws://192.168.1.125:8770');
 
@@ -205,14 +210,30 @@ export default function DCSDashboard() {
         if (msg.data && msg.data.service && typeof msg.data.service.active !== 'undefined') {
           setServiceActive(msg.data.service.active);
         }
+      } else if (msg.type === "log_batch") {
+        enqueueLogs(msg.lines);
+      } else if (msg.type === "log") {
+        enqueueLogs([msg.line]);
+      } else if (msg.type === "log_init") {
+        setLogs(msg.lines.slice(-200));
       }
-      if (msg.type === "log") setLogs(prev => [...prev, msg.line].slice(-200));
-      if (msg.type === "log_init") setLogs(msg.lines.slice(-200));
     };
 
     wsStats.onopen = () => console.log("Connected to stats/logs");
     wsStats.onclose = () => console.log("Disconnected from stats/logs");
     return () => wsStats.close();
+  }, [enqueueLogs]);
+
+  useEffect(() => {
+    const t = setInterval(() => {
+      if (pendingLogsRef.current.length) {
+        setLogs((prev) =>
+          [...prev, ...pendingLogsRef.current].slice(-500)
+        );
+        pendingLogsRef.current = [];
+      }
+    }, 150);
+    return () => clearInterval(t);
   }, []);
 
   /** ----- Send command to Pi ----- */
