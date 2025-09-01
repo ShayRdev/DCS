@@ -1,6 +1,6 @@
 import React from 'react';
 
-function Navbar({ temperature, humidity, site }) {
+function Navbar({ temperature, humidity, site, connected }) {
   const navbarStyle = {
     width: '100%',
     backgroundColor: '#1c1c1e',
@@ -42,6 +42,7 @@ function Navbar({ temperature, humidity, site }) {
     <div style={navbarStyle}>
       <div style={{ fontSize: '16px' }}>{site || "Plant Monitoring Dashboard"}</div>
       <div style={rightSideStyle}>
+        <div><span style={iconStyle}>{connected ? '🟢' : '🔴'}</span>{connected ? 'Online' : 'Offline'}</div>
         <div><span style={iconStyle}>🌡</span>{temperature}°C</div>
         <div><span style={iconStyle}>💧</span>{humidity}% RH</div>
         <div><span style={iconStyle}>🕒</span>{currentTime}</div>

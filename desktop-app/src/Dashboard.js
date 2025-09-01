@@ -13,19 +13,42 @@ function Dashboard() {
     flow: 0,
     pumpStatus: false
   });
+  const [isConnected, setIsConnected] = useState(false);
 
   const tapHeightPercent = 20;
   const visualMinFill = 8;
 
   useEffect(() => {
-    const ws = new WebSocket('ws://192.168.1.125:8765');
-    ws.onopen = () => console.log("Connected to Raspberry Pi simulator");
-    ws.onmessage = (event) => {
-      const temp = parseInt(event.data);
-      setData(prev => ({ ...prev, temperature: temp }));
+    let ws;
+    let reconnectTimer;
+
+    const connect = () => {
+      ws = new WebSocket('ws://192.168.1.125:8765');
+      ws.onopen = () => {
+        console.log('Connected to Raspberry Pi simulator');
+        setIsConnected(true);
+      };
+      ws.onmessage = (event) => {
+        const temp = parseInt(event.data);
+        setData(prev => ({ ...prev, temperature: temp }));
+      };
+      ws.onclose = () => {
+        console.log('Disconnected from simulator');
+        setIsConnected(false);
+        reconnectTimer = setTimeout(connect, 3000);
+      };
+      ws.onerror = () => {
+        setIsConnected(false);
+        ws.close();
+      };
     };
-    ws.onclose = () => console.log("Disconnected from simulator");
-    return () => ws.close();
+
+    connect();
+
+    return () => {
+      clearTimeout(reconnectTimer);
+      if (ws) ws.close();
+    };
   }, []);
 
   useEffect(() => {
@@ -67,7 +90,12 @@ function Dashboard() {
 
   return (
     <div style={containerStyle}>
-      <Navbar temperature={35} humidity={62} site="Unit 400 Tank Control" />
+      <Navbar
+        temperature={35}
+        humidity={62}
+        site="Unit 400 Tank Control"
+        connected={isConnected}
+      />
       <PumpButton pumpStatus={data.pumpStatus} togglePump={togglePump} />
 
       <svg width="1300" height="700" style={{ backgroundColor: '#000', borderRadius: '8px' }}>
