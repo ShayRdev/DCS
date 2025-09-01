@@ -1,11 +1,13 @@
 // DCSDashboard.jsx
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import SystemStatsCard from "./components/SystemStatsCard";
 import PumpControls from "./components/PumpControls";
 import PumpLogsModal from "./components/PumpLogsModal";
+import { useWsConnection } from "./hooks/useWsConnection";
+import ConnBadge from "./components/ConnBadge";
 
 /** ======== CONFIG ======== */
-const WS_URL = "ws://192.168.1.125:8765"; // <-- change if your Pi IP changes
+const PUMP_WS_URL = process.env.PUMP_WS_URL || "ws://192.168.1.125:8765"; // <-- change if your Pi IP changes
 const POLL_MS = 500;                       // simulation tick
 const LOW_LEVEL = 10;                      // % threshold for low-level alarm
 const CLEAR_LEVEL = LOW_LEVEL + 2;         // alarm considered cleared above this %
@@ -165,7 +167,6 @@ function TankGraphic({ levelPct }) {
 
 /** ======== MAIN PAGE ======== */
 export default function DCSDashboard() {
-  const [connOK, setConnOK] = useState(false);
   const [pump, setPump]   = useState(false);
 
   const [sys, setSys] = useState(null);
@@ -186,52 +187,13 @@ export default function DCSDashboard() {
   const [audioReady, setAudioReady] = useState(false);
   const audioRef = useRef(null);
 
-  // WS handling
-  const wsRef = useRef(null);
-  const reconnectRef = useRef(null);
-
-  /** ----- WebSocket connect + auto-reconnect ----- */
-  useEffect(() => {
-    let closed = false;
-    let backoff = 500;
-
-    const connect = () => {
-      if (closed) return;
-      const ws = new WebSocket(WS_URL);
-      wsRef.current = ws;
-
-      ws.onopen = () => {
-        setConnOK(true);
-        backoff = 500;
-      };
-
-      ws.onmessage = (ev) => {
-        try {
-          const msg = JSON.parse(ev.data);
-          if (msg.pump === "on") setPump(true);
-          if (msg.pump === "off") setPump(false);
-        } catch {/* ignore */}
-      };
-
-      ws.onclose = () => {
-        setConnOK(false);
-        if (!closed) {
-          clearTimeout(reconnectRef.current);
-          reconnectRef.current = setTimeout(connect, backoff);
-          backoff = Math.min(backoff * 2, 5000);
-        }
-      };
-
-      ws.onerror = () => ws.close();
-    };
-
-    connect();
-    return () => {
-      closed = true;
-      try { wsRef.current && wsRef.current.close(); } catch {}
-      clearTimeout(reconnectRef.current);
-    };
+  const handlePumpMessage = useCallback((msg) => {
+    if (msg.pump === "on") setPump(true);
+    if (msg.pump === "off") setPump(false);
   }, []);
+
+  const pumpConn = useWsConnection(PUMP_WS_URL, handlePumpMessage);
+  const connOK = pumpConn.state === "CONNECTED" || pumpConn.state === "DEGRADED";
 
   useEffect(() => {
     const wsStats = new WebSocket('ws://192.168.1.125:8770');
@@ -255,10 +217,7 @@ export default function DCSDashboard() {
 
   /** ----- Send command to Pi ----- */
   const sendPump = (on) => {
-    const ws = wsRef.current;
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify({ command: "pump", state: on ? "on" : "off", gpio: 17 }));
-    }
+    pumpConn.send({ command: "pump", state: on ? "on" : "off", gpio: 17 });
   };
 
   /** ----- Unlock audio (autoplay policy) ----- */
@@ -344,7 +303,7 @@ export default function DCSDashboard() {
           <div style={{ fontWeight: 800, letterSpacing: "1px" }}>
             UNIT 400 — TANK CONTROL
           </div>
-          <div style={statusPill(connOK)}>{connOK ? "CONNECTED" : "DISCONNECTED"}</div>
+          <ConnBadge state={pumpConn.state} latencyMs={pumpConn.latencyMs} />
           <div style={statusPill(pump)}>P-101 {pump ? "RUNNING" : "STOPPED"}</div>
         </div>
         <div style={{ color: "#9aa4af", fontSize: 13 }}>{datetime}</div>
@@ -362,10 +321,11 @@ export default function DCSDashboard() {
         <div>
           <div style={sectionTitle}>Connection</div>
           <div style={{ ...panelBase, display: "grid", gap: 8, fontSize: 13, color: "#c3cbd4" }}>
-            <div>WS URL: <span style={{ color: "#9aa4af" }}>{WS_URL}</span></div>
-            <div>Status: <span style={{ color: connOK ? "#7fffb2" : "#ff8e8e" }}>
-              {connOK ? "Online" : "Offline"}
-            </span></div>
+            <div>WS URL: <span style={{ color: "#9aa4af" }}>{PUMP_WS_URL}</span></div>
+            <div>Status: <ConnBadge state={pumpConn.state} latencyMs={pumpConn.latencyMs} /></div>
+            {(pumpConn.state === "NOT_CONFIGURED" || pumpConn.state === "OFFLINE" || pumpConn.state === "ERROR") && (
+              <button style={btn(false)} onClick={pumpConn.connect}>CONNECT</button>
+            )}
           </div>
         </div>
 
