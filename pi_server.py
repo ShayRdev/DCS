@@ -117,6 +117,9 @@ async def handler(ws):
                 obj = json.loads(message)
             except json.JSONDecodeError:
                 continue
+            if obj.get("type") == "ping":
+                await ws.send(json.dumps({"type": "pong", "t": obj.get("t")}))
+                continue
             if obj.get("command") == "pump":
                 state = obj.get("state")
                 print(f"Pump command: {state}")
