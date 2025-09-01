@@ -8,7 +8,7 @@ function SystemStatsCard({ stats }) {
     return `${h}h ${m}m ${sec}s`;
   };
 
-  const pill = () => {
+  const servicePill = () => {
     const state = stats?.service?.active || "inactive";
     const base = "px-2 py-0.5 rounded-full text-xs capitalize";
     if (state === "running") return `${base} bg-green-600 text-white`;
@@ -16,13 +16,25 @@ function SystemStatsCard({ stats }) {
     return `${base} bg-gray-600 text-white`;
   };
 
+  const connPill = () => {
+    const base = "px-2 py-0.5 rounded-full text-xs";
+    return stats?.connected
+      ? `${base} bg-green-600 text-white`
+      : `${base} bg-gray-600 text-white`;
+  };
+
   return (
     <div className="bg-[#15181b] border-2 border-[#32373e] rounded p-3 text-xs text-gray-300 font-mono">
       <div className="flex items-center justify-between mb-2">
         <div className="uppercase text-gray-400">System Stats</div>
-        {stats && <span className={pill()}>{stats.service.active}</span>}
+        <div className="flex items-center gap-1">
+          <span className={connPill()}>
+            {stats?.connected ? "Connected" : "Inactive/Disconnected"}
+          </span>
+          {stats && <span className={servicePill()}>{stats.service.active}</span>}
+        </div>
       </div>
-      {stats ? (
+      {stats && stats.connected ? (
         <div className="grid grid-cols-2 gap-y-1">
           <div>CPU</div>
           <div className="text-right">{stats.cpu_pct.toFixed(1)}%</div>
@@ -38,7 +50,7 @@ function SystemStatsCard({ stats }) {
           <div className="text-right">{uptime(stats.uptime_s)}</div>
         </div>
       ) : (
-        <div className="text-gray-500">No data</div>
+        <div className="text-gray-500">System Stats inactive</div>
       )}
     </div>
   );

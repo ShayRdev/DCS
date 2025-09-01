@@ -3,11 +3,13 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import SystemStatsCard from "./components/SystemStatsCard";
 import PumpControls from "./components/PumpControls";
 import PumpLogsModal from "./components/PumpLogsModal";
-import { useWsConnection } from "./hooks/useWsConnection";
 import ConnBadge from "./components/ConnBadge";
+import { autoWS } from "./utils/autoWS";
 
 /** ======== CONFIG ======== */
-const PUMP_WS_URL = process.env.PUMP_WS_URL || "ws://192.168.1.125:8765"; // <-- change if your Pi IP changes
+const HOST = process.env.REACT_APP_PI_HOST || window.location.hostname;
+const RELAY_WS = `ws://${HOST}:${process.env.REACT_APP_RELAY_PORT || 8765}`;
+const STATS_WS = `ws://${HOST}:${process.env.REACT_APP_STATS_PORT || 8770}`;
 const POLL_MS = 500;                       // simulation tick
 const LOW_LEVEL = 10;                      // % threshold for low-level alarm
 const CLEAR_LEVEL = LOW_LEVEL + 2;         // alarm considered cleared above this %
@@ -167,14 +169,25 @@ function TankGraphic({ levelPct }) {
 
 /** ======== MAIN PAGE ======== */
 export default function DCSDashboard() {
-  const [pump, setPump]   = useState(false);
+  const [pump, setPump] = useState(false);
 
-  const [sys, setSys] = useState(null);
+  const [stats, setStats] = useState({
+    connected: false,
+    cpu_pct: 0,
+    cpu_temp_c: 0,
+    mem_pct: 0,
+    disk_root_pct: 0,
+    uptime_s: 0,
+    service: { name: "tankpi.service", active: "unknown" },
+  });
   const [logs, setLogs] = useState([]);
   const pendingLogsRef = useRef([]);
   const [showPumpLogs, setShowPumpLogs] = useState(false);
   const [paused, setPaused] = useState(false);
-  const [serviceActive, setServiceActive] = useState('inactive');
+
+  const relayWsRef = useRef(null);
+  const [relayState, setRelayState] = useState("CONNECTING");
+  const connOK = relayState === "CONNECTED";
 
   // PVs
   const [level, setLevel] = useState(35);
@@ -193,36 +206,75 @@ export default function DCSDashboard() {
     if (msg.pump === "off") setPump(false);
   }, []);
 
-  const pumpConn = useWsConnection(PUMP_WS_URL, handlePumpMessage);
-  const connOK = pumpConn.state === "CONNECTED" || pumpConn.state === "DEGRADED";
-
   const enqueueLogs = useCallback((lines) => {
     pendingLogsRef.current.push(...lines);
   }, []);
 
   useEffect(() => {
-    const wsStats = new WebSocket('ws://192.168.1.125:8770');
+    setRelayState("CONNECTING");
 
-    wsStats.onmessage = (e) => {
-      let msg; try { msg = JSON.parse(e.data); } catch { return; }
-      if (msg.type === "metrics") {
-        setSys(msg.data);
-        if (msg.data && msg.data.service && typeof msg.data.service.active !== 'undefined') {
-          setServiceActive(msg.data.service.active);
+    const stopRelay = autoWS(RELAY_WS, {
+      onOpen: (e) => {
+        relayWsRef.current = e.target;
+        setRelayState("CONNECTED");
+      },
+      onClose: () => {
+        relayWsRef.current = null;
+        setRelayState("OFFLINE");
+      },
+      onMessage: (e) => {
+        let msg;
+        try {
+          msg = JSON.parse(e.data);
+        } catch {
+          return;
         }
-      } else if (msg.type === "log_batch") {
-        enqueueLogs(msg.lines);
-      } else if (msg.type === "log") {
-        enqueueLogs([msg.line]);
-      } else if (msg.type === "log_init") {
-        setLogs(msg.lines.slice(-200));
+        handlePumpMessage(msg);
+      },
+    });
+
+    const stopStats = autoWS(STATS_WS, {
+      onOpen: () => setStats((s) => ({ ...s, connected: true })),
+      onClose: () => setStats((s) => ({ ...s, connected: false })),
+      onMessage: (e) => {
+        try {
+          const msg = JSON.parse(e.data);
+          if (msg.type === "metrics" && msg.data) {
+            const d = msg.data;
+            setStats((s) => ({
+              ...s,
+              connected: true,
+              cpu_pct: d.cpu_pct ?? s.cpu_pct,
+              cpu_temp_c: d.cpu_temp_c ?? s.cpu_temp_c,
+              mem_pct: d.mem_pct ?? s.mem_pct,
+              disk_root_pct: d.disk_root_pct ?? s.disk_root_pct,
+              uptime_s: d.uptime_s ?? s.uptime_s,
+              service: d.service ?? s.service,
+            }));
+          } else if (msg.type === "log_batch") {
+            enqueueLogs(msg.lines);
+          } else if (msg.type === "log") {
+            enqueueLogs([msg.line]);
+          } else if (msg.type === "log_init") {
+            setLogs(msg.lines.slice(-200));
+          }
+        } catch {}
+      },
+    });
+
+    const onVis = () => {
+      if (document.visibilityState === "visible") {
+        // autoWS will handle reconnects; placeholder for future logic
       }
     };
+    document.addEventListener("visibilitychange", onVis);
 
-    wsStats.onopen = () => console.log("Connected to stats/logs");
-    wsStats.onclose = () => console.log("Disconnected from stats/logs");
-    return () => wsStats.close();
-  }, [enqueueLogs]);
+    return () => {
+      stopRelay();
+      stopStats();
+      document.removeEventListener("visibilitychange", onVis);
+    };
+  }, [enqueueLogs, handlePumpMessage]);
 
   useEffect(() => {
     const t = setInterval(() => {
@@ -238,7 +290,12 @@ export default function DCSDashboard() {
 
   /** ----- Send command to Pi ----- */
   const sendPump = (on) => {
-    pumpConn.send({ command: "pump", state: on ? "on" : "off", gpio: 17 });
+    const ws = relayWsRef.current;
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(
+        JSON.stringify({ command: "pump", state: on ? "on" : "off", gpio: 17 })
+      );
+    }
   };
 
   /** ----- Unlock audio (autoplay policy) ----- */
@@ -324,7 +381,7 @@ export default function DCSDashboard() {
           <div style={{ fontWeight: 800, letterSpacing: "1px" }}>
             UNIT 400 — TANK CONTROL
           </div>
-          <ConnBadge state={pumpConn.state} latencyMs={pumpConn.latencyMs} />
+          <ConnBadge state={relayState} />
           <div style={statusPill(pump)}>P-101 {pump ? "RUNNING" : "STOPPED"}</div>
         </div>
         <div style={{ color: "#9aa4af", fontSize: 13 }}>{datetime}</div>
@@ -342,15 +399,12 @@ export default function DCSDashboard() {
         <div>
           <div style={sectionTitle}>Connection</div>
           <div style={{ ...panelBase, display: "grid", gap: 8, fontSize: 13, color: "#c3cbd4" }}>
-            <div>WS URL: <span style={{ color: "#9aa4af" }}>{PUMP_WS_URL}</span></div>
-            <div>Status: <ConnBadge state={pumpConn.state} latencyMs={pumpConn.latencyMs} /></div>
-            {(pumpConn.state === "NOT_CONFIGURED" || pumpConn.state === "OFFLINE" || pumpConn.state === "ERROR") && (
-              <button style={btn(false)} onClick={pumpConn.connect}>CONNECT</button>
-            )}
+            <div>WS URL: <span style={{ color: "#9aa4af" }}>{RELAY_WS}</span></div>
+            <div>Status: <ConnBadge state={relayState} /></div>
           </div>
         </div>
 
-        <SystemStatsCard stats={sys} />
+        <SystemStatsCard stats={stats} />
       </div>
 
       {/* Main: Process Graphic */}
@@ -408,7 +462,7 @@ export default function DCSDashboard() {
         onClear={handleClearLogs}
         paused={paused}
         onPauseToggle={() => setPaused((p) => !p)}
-        serviceActive={serviceActive}
+        serviceActive={stats.service.active}
       />
     </div>
   );
