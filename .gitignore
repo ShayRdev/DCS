@@ -1,0 +1,9 @@
+# build outputs
+desktop-app/build/
+desktop-app/dist/
+
+# giant media
+desktop-app/public/alarm.wav
+
+# noise
+*.log
