@@ -4,6 +4,7 @@ import Pipe from './components/Pipe';
 import PumpButton from './components/PumpButton';
 import Navbar from './components/Navbar';
 import TransmitterWithGauge from './components/TransmitterWithGauge';
+import LogViewer from './components/LogViewer';
 
 function Dashboard() {
   const [data, setData] = useState({
@@ -13,6 +14,7 @@ function Dashboard() {
     flow: 0,
     pumpStatus: false
   });
+  const [logs, setLogs] = useState([]);
 
   const tapHeightPercent = 20;
   const visualMinFill = 8;
@@ -21,8 +23,16 @@ function Dashboard() {
     const ws = new WebSocket('ws://192.168.1.125:8765');
     ws.onopen = () => console.log("Connected to Raspberry Pi simulator");
     ws.onmessage = (event) => {
-      const temp = parseInt(event.data);
-      setData(prev => ({ ...prev, temperature: temp }));
+      try {
+        const msg = JSON.parse(event.data);
+        if (msg.type === 'log')
+          setLogs(prev => [...prev, msg.line].slice(-200));
+        else if (msg.type === 'log_init')
+          setLogs(msg.lines.slice(-200));
+      } catch (e) {
+        const temp = parseInt(event.data);
+        setData(prev => ({ ...prev, temperature: temp }));
+      }
     };
     ws.onclose = () => console.log("Disconnected from simulator");
     return () => ws.close();
@@ -102,6 +112,9 @@ function Dashboard() {
           <TransmitterWithGauge tag="LT-101" value={ltLevel} unit="inH₂O" min={0} max={30} />
         </foreignObject>
       </svg>
+      <div style={{ width: '100%', marginTop: '20px' }}>
+        <LogViewer lines={logs} />
+      </div>
     </div>
   );
 }
