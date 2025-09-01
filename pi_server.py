@@ -43,7 +43,7 @@ import websockets
 PORT = 8770
 SERVICE = "tankpi.service"
 LOG_MAX = 200
-LOG_BATCH_MS = 150
+LOG_BATCH_MS = 50
 METRICS_PERIOD = 5
 
 # ---- State ----
