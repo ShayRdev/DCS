@@ -4,12 +4,11 @@ import SystemStatsCard from "./components/SystemStatsCard";
 import PumpControls from "./components/PumpControls";
 import PumpLogsModal from "./components/PumpLogsModal";
 import ConnBadge from "./components/ConnBadge";
-import { autoWS } from "./utils/autoWS";
+import { useDcsConnections } from "./hooks/useDcsConnections";
 
 /** ======== CONFIG ======== */
 const HOST = process.env.REACT_APP_PI_HOST || window.location.hostname;
 const RELAY_WS = `ws://${HOST}:${process.env.REACT_APP_RELAY_PORT || 8765}`;
-const STATS_WS = `ws://${HOST}:${process.env.REACT_APP_STATS_PORT || 8770}`;
 const POLL_MS = 500;                       // simulation tick
 const LOW_LEVEL = 10;                      // % threshold for low-level alarm
 const CLEAR_LEVEL = LOW_LEVEL + 2;         // alarm considered cleared above this %
@@ -185,8 +184,57 @@ export default function DCSDashboard() {
   const [showPumpLogs, setShowPumpLogs] = useState(false);
   const [paused, setPaused] = useState(false);
 
-  const relayWsRef = useRef(null);
-  const [relayState, setRelayState] = useState("CONNECTING");
+  const handleRelayRaw = useCallback(
+    (raw) => {
+      let msg;
+      try {
+        msg = JSON.parse(raw);
+      } catch {
+        return;
+      }
+      handlePumpMessage(msg);
+    },
+    [handlePumpMessage]
+  );
+
+  const handleStatsRaw = useCallback(
+    (raw) => {
+      try {
+        const msg = JSON.parse(raw);
+        if (msg.type === "metrics" && msg.data) {
+          const d = msg.data;
+          setStats((s) => ({
+            ...s,
+            connected: true,
+            cpu_pct: d.cpu_pct ?? s.cpu_pct,
+            cpu_temp_c: d.cpu_temp_c ?? s.cpu_temp_c,
+            mem_pct: d.mem_pct ?? s.mem_pct,
+            disk_root_pct: d.disk_root_pct ?? s.disk_root_pct,
+            uptime_s: d.uptime_s ?? s.uptime_s,
+            service: d.service ?? s.service,
+          }));
+        } else if (msg.type === "log_batch") {
+          enqueueLogs(msg.lines);
+        } else if (msg.type === "log") {
+          enqueueLogs([msg.line]);
+        } else if (msg.type === "log_init") {
+          setLogs(msg.lines.slice(-200));
+        }
+      } catch {}
+    },
+    [enqueueLogs]
+  );
+
+  const {
+    relayConnected,
+    connecting,
+    sendRelay,
+  } = useDcsConnections({
+    onRelayMessage: handleRelayRaw,
+    onStatsMessage: handleStatsRaw,
+  });
+
+  const relayState = relayConnected ? "CONNECTED" : connecting ? "CONNECTING" : "OFFLINE";
   const connOK = relayState === "CONNECTED";
 
   // PVs
@@ -210,71 +258,7 @@ export default function DCSDashboard() {
     pendingLogsRef.current.push(...lines);
   }, []);
 
-  useEffect(() => {
-    setRelayState("CONNECTING");
-
-    const stopRelay = autoWS(RELAY_WS, {
-      onOpen: (e) => {
-        relayWsRef.current = e.target;
-        setRelayState("CONNECTED");
-      },
-      onClose: () => {
-        relayWsRef.current = null;
-        setRelayState("OFFLINE");
-      },
-      onMessage: (e) => {
-        let msg;
-        try {
-          msg = JSON.parse(e.data);
-        } catch {
-          return;
-        }
-        handlePumpMessage(msg);
-      },
-    });
-
-    const stopStats = autoWS(STATS_WS, {
-      onOpen: () => setStats((s) => ({ ...s, connected: true })),
-      onClose: () => setStats((s) => ({ ...s, connected: false })),
-      onMessage: (e) => {
-        try {
-          const msg = JSON.parse(e.data);
-          if (msg.type === "metrics" && msg.data) {
-            const d = msg.data;
-            setStats((s) => ({
-              ...s,
-              connected: true,
-              cpu_pct: d.cpu_pct ?? s.cpu_pct,
-              cpu_temp_c: d.cpu_temp_c ?? s.cpu_temp_c,
-              mem_pct: d.mem_pct ?? s.mem_pct,
-              disk_root_pct: d.disk_root_pct ?? s.disk_root_pct,
-              uptime_s: d.uptime_s ?? s.uptime_s,
-              service: d.service ?? s.service,
-            }));
-          } else if (msg.type === "log_batch") {
-            enqueueLogs(msg.lines);
-          } else if (msg.type === "log") {
-            enqueueLogs([msg.line]);
-          } else if (msg.type === "log_init") {
-            setLogs(msg.lines.slice(-200));
-          }
-        } catch {}
-      },
-    });
-
-    const onVis = () => {
-      if (document.visibilityState === "visible") {
-        // autoWS will handle reconnects; placeholder for future logic
-      }
-    };
-    document.addEventListener("visibilitychange", onVis);
-
-    return () => {
-      stopRelay();
-      stopStats();
-      document.removeEventListener("visibilitychange", onVis);
-    };
-  }, [enqueueLogs, handlePumpMessage]);
+  // remove old autoWS effect; connections handled by useDcsConnections
 
   useEffect(() => {
     const t = setInterval(() => {
@@ -290,12 +274,9 @@ export default function DCSDashboard() {
 
   /** ----- Send command to Pi ----- */
   const sendPump = (on) => {
-    const ws = relayWsRef.current;
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(
-        JSON.stringify({ command: "pump", state: on ? "on" : "off", gpio: 17 })
-      );
-    }
+    sendRelay(
+      JSON.stringify({ command: "pump", state: on ? "on" : "off", gpio: 17 })
+    );
   };
 
   /** ----- Unlock audio (autoplay policy) ----- */

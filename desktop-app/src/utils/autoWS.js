@@ -1,15 +1,36 @@
-export function autoWS(url, { onOpen, onMessage, onClose, onError } = {}) {
-  let ws;
-  let backoff = 500; // ms
-  const max = 8000;
+// Minimal reconnecting WebSocket with backoff + jitter.
+// Internal helper; do not export to UI.
+export function spawnAutoWS(url, handlers = {}, opts = {}) {
+  const { onOpen, onMessage, onClose, onError } = handlers;
+  const {
+    initialDelay = 500,
+    maxDelay = 8000,
+    jitterRatio = 0.1,
+    onPlannedRetry,
+  } = opts;
+
+  let ws = null;
   let stopped = false;
+  let delay = initialDelay;
+  let timer = null;
+
+  const jitter = (ms) => {
+    const j = ms * jitterRatio;
+    return ms + (Math.random() * 2 * j - j); // ±10%
+  };
 
   const connect = () => {
     if (stopped) return;
-    ws = new WebSocket(url);
+    try {
+      ws = new WebSocket(url);
+    } catch (e) {
+      onError?.(e);
+      scheduleReconnect();
+      return;
+    }
 
     ws.onopen = (ev) => {
-      backoff = 500;
+      delay = initialDelay;
       onOpen?.(ev);
     };
 
@@ -17,9 +38,7 @@ export function autoWS(url, { onOpen, onMessage, onClose, onError } = {}) {
 
     ws.onclose = (ev) => {
       onClose?.(ev);
-      if (stopped) return;
-      setTimeout(connect, backoff);
-      backoff = Math.min(backoff * 2, max);
+      scheduleReconnect();
     };
 
     ws.onerror = (ev) => {
@@ -28,10 +47,35 @@ export function autoWS(url, { onOpen, onMessage, onClose, onError } = {}) {
     };
   };
 
-  connect();
+  const scheduleReconnect = () => {
+    if (stopped) return;
+    const wait = Math.round(jitter(delay));
+    timer = setTimeout(connect, wait);
+    delay = Math.min(delay * 2, maxDelay);
+    onPlannedRetry?.(wait);
+  };
 
-  return () => {
+  const start = () => { connect(); };
+  const stop = () => {
     stopped = true;
+    if (timer) clearTimeout(timer);
     try { ws && ws.close(); } catch {}
   };
+  const poke = () => {
+    if (timer) clearTimeout(timer);
+    delay = initialDelay;
+    try { ws && ws.close(); } catch {}
+    timer = setTimeout(connect, 0);
+  };
+  const send = (data) => {
+    try {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(data);
+        return true;
+      }
+    } catch {}
+    return false;
+  };
+
+  return { start, stop, poke, send };
 }
