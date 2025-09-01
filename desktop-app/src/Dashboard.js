@@ -184,24 +184,23 @@ export default function DCSDashboard() {
   const [showPumpLogs, setShowPumpLogs] = useState(false);
   const [paused, setPaused] = useState(false);
 
-  const handleRelayRaw = useCallback(
-    (raw) => {
-      let msg;
-      try {
-        msg = JSON.parse(raw);
-      } catch {
-        return;
-      }
-      handlePumpMessage(msg);
-    },
-    [handlePumpMessage]
-  );
+  const enqueueLogs = useCallback((lines) => {
+    pendingLogsRef.current.push(...lines);
+  }, []);
 
-  const handleStatsRaw = useCallback(
+  const handlePumpMessage = useCallback((raw) => {
+    try {
+      const msg = JSON.parse(raw);
+      if (msg.pump === "on") setPump(true);
+      if (msg.pump === "off") setPump(false);
+    } catch {}
+  }, []);
+
+  const handleStatsMessage = useCallback(
     (raw) => {
       try {
         const msg = JSON.parse(raw);
-        if (msg.type === "metrics" && msg.data) {
+        if (msg?.type === "metrics" && msg.data) {
           const d = msg.data;
           setStats((s) => ({
             ...s,
@@ -227,12 +226,19 @@ export default function DCSDashboard() {
 
   const {
     relayConnected,
+    statsConnected,
     connecting,
     sendRelay,
   } = useDcsConnections({
-    onRelayMessage: handleRelayRaw,
-    onStatsMessage: handleStatsRaw,
+    onRelayMessage: handlePumpMessage,
+    onStatsMessage: handleStatsMessage,
   });
+
+  useEffect(() => {
+    if (!statsConnected) {
+      setStats((s) => ({ ...s, connected: false }));
+    }
+  }, [statsConnected]);
 
   const relayState = relayConnected ? "CONNECTED" : connecting ? "CONNECTING" : "OFFLINE";
   const connOK = relayState === "CONNECTED";
@@ -249,14 +255,7 @@ export default function DCSDashboard() {
   const [audioReady, setAudioReady] = useState(false);
   const audioRef = useRef(null);
 
-  const handlePumpMessage = useCallback((msg) => {
-    if (msg.pump === "on") setPump(true);
-    if (msg.pump === "off") setPump(false);
-  }, []);
 
-  const enqueueLogs = useCallback((lines) => {
-    pendingLogsRef.current.push(...lines);
-  }, []);
 
   // remove old autoWS effect; connections handled by useDcsConnections
 

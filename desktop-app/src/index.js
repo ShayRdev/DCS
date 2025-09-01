@@ -1,6 +1,6 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import Dashboard from './Dashboard';
+import { createRoot } from 'react-dom/client';
+import App from './App';
 import './global.css';
 
 const globalStyle = document.createElement('style');
@@ -14,4 +14,6 @@ globalStyle.innerHTML = `
 `;
 document.head.appendChild(globalStyle);
 
-ReactDOM.render(<Dashboard />, document.getElementById('root'));
+const container = document.getElementById('root');
+const root = createRoot(container);
+root.render(<React.StrictMode><App /></React.StrictMode>);
