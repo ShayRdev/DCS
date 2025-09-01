@@ -181,12 +181,26 @@ export default function DCSDashboard() {
   });
   const [logs, setLogs] = useState([]);
   const pendingLogsRef = useRef([]);
+  const flushHandleRef = useRef(null);
   const [showPumpLogs, setShowPumpLogs] = useState(false);
   const [paused, setPaused] = useState(false);
 
+  const flushPendingLogs = useCallback(() => {
+    if (pendingLogsRef.current.length) {
+      setLogs((prev) =>
+        [...prev, ...pendingLogsRef.current].slice(-500)
+      );
+      pendingLogsRef.current = [];
+    }
+    flushHandleRef.current = null;
+  }, []);
+
   const enqueueLogs = useCallback((lines) => {
     pendingLogsRef.current.push(...lines);
-  }, []);
+    if (flushHandleRef.current === null) {
+      flushHandleRef.current = requestAnimationFrame(flushPendingLogs);
+    }
+  }, [flushPendingLogs]);
 
   const handlePumpMessage = useCallback((raw) => {
     try {
@@ -260,15 +274,11 @@ export default function DCSDashboard() {
   // remove old autoWS effect; connections handled by useDcsConnections
 
   useEffect(() => {
-    const t = setInterval(() => {
-      if (pendingLogsRef.current.length) {
-        setLogs((prev) =>
-          [...prev, ...pendingLogsRef.current].slice(-500)
-        );
-        pendingLogsRef.current = [];
+    return () => {
+      if (flushHandleRef.current !== null) {
+        cancelAnimationFrame(flushHandleRef.current);
       }
-    }, 150);
-    return () => clearInterval(t);
+    };
   }, []);
 
   /** ----- Send command to Pi ----- */
