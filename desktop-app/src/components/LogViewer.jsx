@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 /**
  * Generic log viewer with optional filtering and controls.
@@ -10,7 +10,7 @@ import React, { useEffect, useRef, useState } from 'react';
  *  - paused?: boolean           When true, auto-scroll is disabled
  *  - header?: string            Optional title to show in the header
  */
-export default function LogViewer({
+function LogViewer({
   lines,
   onClear,
   onPauseToggle,
@@ -25,10 +25,11 @@ export default function LogViewer({
     if (!paused) {
       bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [lines, paused, filter]);
+  }, [lines, paused]);
 
-  const filtered = lines.filter((l) =>
-    l.toLowerCase().includes(filter.toLowerCase())
+  const filtered = useMemo(
+    () => lines.filter((l) => l.toLowerCase().includes(filter.toLowerCase())),
+    [lines, filter]
   );
 
   return (
@@ -64,3 +65,5 @@ export default function LogViewer({
     </div>
   );
 }
+
+export default React.memo(LogViewer);

@@ -1,16 +1,56 @@
+#!/usr/bin/env python3
+"""
+pi_server.py - metrics and log WebSocket server for TankPi.
+
+Setup:
+    pip install websockets psutil
+
+Run:
+    python3 pi_server.py
+
+Optional systemd unit (/etc/systemd/system/pi_stats.service):
+    [Unit]
+    Description=TankPi stats server
+    After=network.target
+
+    [Service]
+    ExecStart=/usr/bin/python3 /home/pi/tankpi/pi_server.py
+    Restart=always
+
+    [Install]
+    WantedBy=multi-user.target
+
+Diagnostics:
+    # If "address already in use"
+    sudo lsof -i :8770 -P -n
+    sudo fuser -k 8770/tcp
+
+Verify:
+    websocat -t ws://<pi>:8770
+    # Expect: log_init, metrics, log_batch ...
+"""
+
 import asyncio
 import json
 import time
 from collections import deque
+from typing import Deque, Set
 
 import psutil
 import websockets
 
-CONNECTED = set()
-LOG_BUFFER = deque(maxlen=100)
+PORT = 8770
+SERVICE = "tankpi.service"
+LOG_MAX = 200
+LOG_BATCH_MS = 150
+METRICS_PERIOD = 5
+
+CONNECTED: Set[websockets.WebSocketServerProtocol] = set()
+LOG_BUFFER: Deque[str] = deque(maxlen=LOG_MAX)
+FOLLOW_TASK: asyncio.Task | None = None
 
 
-async def get_cpu_temp():
+async def get_cpu_temp() -> float | None:
     path = "/sys/class/thermal/thermal_zone0/temp"
     try:
         with open(path) as f:
@@ -19,11 +59,11 @@ async def get_cpu_temp():
         return None
 
 
-async def get_service_state():
+async def get_service_state() -> str:
     proc = await asyncio.create_subprocess_exec(
         "systemctl",
         "is-active",
-        "tankpi.service",
+        SERVICE,
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
     )
@@ -34,8 +74,8 @@ async def get_service_state():
     return state
 
 
-async def gather_metrics():
-    cpu_pct = psutil.cpu_percent()
+async def gather_metrics() -> dict:
+    cpu_pct = psutil.cpu_percent(interval=None)
     cpu_temp_c = await get_cpu_temp()
     mem_pct = psutil.virtual_memory().percent
     disk_root_pct = psutil.disk_usage("/").percent
@@ -47,39 +87,39 @@ async def gather_metrics():
         "mem_pct": mem_pct,
         "disk_root_pct": disk_root_pct,
         "uptime_s": uptime_s,
-        "service": {"name": "tankpi.service", "active": service_state},
+        "service": {"name": SERVICE, "active": service_state},
     }
 
 
-async def send_all(message: str):
-    if CONNECTED:
-        await asyncio.gather(*[ws.send(message) for ws in list(CONNECTED)])
+async def broadcast(message: str) -> None:
+    if not CONNECTED:
+        return
+    webs = list(CONNECTED)
+    results = await asyncio.gather(
+        *(ws.send(message) for ws in webs), return_exceptions=True
+    )
+    for ws, res in zip(webs, results):
+        if isinstance(res, Exception):
+            CONNECTED.discard(ws)
 
 
-async def metrics_publisher():
+async def metrics_publisher() -> None:
     while True:
         data = await gather_metrics()
-        await send_all(json.dumps({"type": "metrics", "data": data}))
-        await asyncio.sleep(5)
+        await broadcast(json.dumps({"type": "metrics", "data": data}))
+        await asyncio.sleep(METRICS_PERIOD)
 
 
-async def temperature_publisher():
-    while True:
-        temp = await get_cpu_temp()
-        if temp is not None:
-            await send_all(str(round(temp, 1)))
-        await asyncio.sleep(1)
-
-
-async def init_log_buffer():
+async def init_log_buffer() -> None:
     cmd = [
         "journalctl",
         "-u",
-        "tankpi.service",
+        SERVICE,
         "-n",
-        "100",
+        str(LOG_MAX),
         "-o",
         "short-iso",
+        "--no-pager",
     ]
     proc = await asyncio.create_subprocess_exec(
         *cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
@@ -89,29 +129,69 @@ async def init_log_buffer():
         LOG_BUFFER.append(line.strip())
 
 
-async def follow_journal():
-    cmd = ["journalctl", "-u", "tankpi.service", "-f", "-o", "short-iso"]
-    proc = await asyncio.create_subprocess_exec(
-        *cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
-    )
+async def follow_journal() -> None:
     while True:
-        line = await proc.stdout.readline()
-        if not line:
-            await asyncio.sleep(0.1)
-            continue
-        text = line.decode().rstrip()
-        LOG_BUFFER.append(text)
-        await send_all(json.dumps({"type": "log", "line": text}))
+        cmd = [
+            "journalctl",
+            "-u",
+            SERVICE,
+            "-f",
+            "-o",
+            "short-iso",
+            "--no-pager",
+        ]
+        proc = await asyncio.create_subprocess_exec(
+            *cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+        )
+        batch: list[str] = []
+        flush_task: asyncio.Task | None = None
+
+        async def flush() -> None:
+            nonlocal batch, flush_task
+            if batch:
+                await broadcast(json.dumps({"type": "log_batch", "lines": batch}))
+                batch = []
+            flush_task = None
+
+        try:
+            while True:
+                line = await proc.stdout.readline()
+                if not line:
+                    break
+                text = line.decode().rstrip()
+                LOG_BUFFER.append(text)
+                batch.append(text)
+                if flush_task is None:
+                    flush_task = asyncio.create_task(
+                        asyncio.sleep(LOG_BATCH_MS / 1000)
+                    )
+                    flush_task.add_done_callback(lambda t: asyncio.create_task(flush()))
+        except asyncio.CancelledError:
+            if flush_task is not None:
+                flush_task.cancel()
+            try:
+                proc.kill()
+            except ProcessLookupError:
+                pass
+            await proc.wait()
+            raise
+        finally:
+            if flush_task is not None:
+                await flush()
+            try:
+                proc.kill()
+            except ProcessLookupError:
+                pass
+            await proc.wait()
+        await asyncio.sleep(1)
 
 
-async def handler(ws):
+async def handler(ws: websockets.WebSocketServerProtocol) -> None:
     CONNECTED.add(ws)
     try:
-        # send initial metrics and logs
         data = await gather_metrics()
         await ws.send(json.dumps({"type": "metrics", "data": data}))
         await ws.send(json.dumps({"type": "log_init", "lines": list(LOG_BUFFER)}))
-
         async for message in ws:
             try:
                 obj = json.loads(message)
@@ -119,22 +199,25 @@ async def handler(ws):
                 continue
             if obj.get("type") == "ping":
                 await ws.send(json.dumps({"type": "pong", "t": obj.get("t")}))
-                continue
-            if obj.get("command") == "pump":
-                state = obj.get("state")
-                print(f"Pump command: {state}")
     finally:
-        CONNECTED.remove(ws)
+        CONNECTED.discard(ws)
 
 
-async def main():
+async def main() -> None:
     await init_log_buffer()
-    async with websockets.serve(handler, "", 8765):
-        await asyncio.gather(
-            metrics_publisher(),
-            temperature_publisher(),
-            follow_journal(),
-        )
+    async with websockets.serve(handler, "0.0.0.0", PORT):
+        print(f"Listening on ws://0.0.0.0:{PORT}")
+        metrics_task = asyncio.create_task(metrics_publisher())
+        global FOLLOW_TASK
+        FOLLOW_TASK = asyncio.create_task(follow_journal())
+        try:
+            await asyncio.Future()
+        finally:
+            metrics_task.cancel()
+            if FOLLOW_TASK is not None:
+                FOLLOW_TASK.cancel()
+                await asyncio.gather(FOLLOW_TASK, return_exceptions=True)
+            await asyncio.gather(metrics_task, return_exceptions=True)
 
 
 if __name__ == "__main__":
