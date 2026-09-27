@@ -1,39 +1,55 @@
 import React from 'react';
 
 function Tank({ tag, level }) {
-  const tankContainer = {
-    width: '150px',
-    height: '400px',
-    borderRadius: '20px',
-    backgroundColor: '#111',
-    boxShadow: '0 0 20px #00f, 0 0 40px #00f inset',
-    border: '2px solid #0ff',
-    position: 'relative',
-    overflow: 'hidden'
-  };
-
-  const fluidStyle = {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    width: '100%',
-    height: `${level}%`,
-    background: 'linear-gradient(to top, #00f, #00f)',
-    boxShadow: '0 0 10px #00f'
-  };
-
-  const tagStyle = {
-    textAlign: 'center',
-    marginBottom: '10px',
-    color: '#0ff',
-    textShadow: '0 0 5px #0ff'
-  };
+  const clamped = Math.max(0, Math.min(100, Number(level) || 0));
 
   return (
     <div style={{ textAlign: 'center' }}>
-      <div style={tagStyle}>{tag}</div>
-      <div style={tankContainer}>
-        <div style={fluidStyle}></div>
+      <div
+        style={{
+          fontFamily: 'IBM Plex Mono, monospace',
+          fontSize: 12,
+          letterSpacing: '0.12em',
+          color: '#8b97a5',
+          marginBottom: 10,
+        }}
+      >
+        {tag}
+      </div>
+      <div
+        style={{
+          width: 150,
+          height: 400,
+          margin: '0 auto',
+          borderRadius: 10,
+          border: '1px solid #2a343e',
+          background: 'linear-gradient(180deg, #12171c, #0b0e11)',
+          position: 'relative',
+          overflow: 'hidden',
+          boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.03)',
+        }}
+      >
+        <div
+          style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: `${clamped}%`,
+            background:
+              'linear-gradient(180deg, rgba(91,126,166,0.85), rgba(61,184,160,0.75))',
+            transition: 'height 0.4s ease',
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            inset: 12,
+            border: '1px dashed #2a343e',
+            borderRadius: 6,
+            pointerEvents: 'none',
+          }}
+        />
       </div>
     </div>
   );

@@ -1,80 +1,141 @@
 # DCS — Desktop Control System
 
-A personal hardware-software project that bridges a custom-modified Raspberry Pi with a desktop app, enabling full two-way communication: send commands, read sensor data, and monitor your hardware in real time.
+Personal portfolio project: a **Raspberry Pi** reads a **Rosemount temperature transmitter** through an **ADS1115** (I²C), prints live values in the terminal, and streams them to an **Electron** desktop app over the LAN.
+
+Built and verified on real hardware (Pi + ADS1115 + Rosemount 4–20 mA loop). Anyone with a Pi, breadboard, and the parts below can reproduce it.
 
 ---
 
-## Overview
+## What it measured
 
-DCS consists of two parts:
+| Signal | Source | Path |
+|---|---|---|
+| Process temperature (°C) | Rosemount 2-wire transmitter | 4–20 mA → 100 Ω shunt → ADS1115 AIN0 → Pi |
+| Loop current (mA) / shunt voltage (V) | Same ADC sample | Converted in `raspberry-pi/dcs_server.py` |
 
-- **`desktop-app/`** — An Electron/JavaScript desktop application that acts as a dashboard, configuration tool, and command interface for the Pi.
-- **`simulator/`** — A software simulator for testing the system without needing the physical hardware connected.
+Default scale: **4 mA → 0 °C**, **20 mA → 100 °C** (match your transmitter’s LRV/URV).
 
-The system communicates with a custom-built Raspberry Pi breakout setup, designed and hand-soldered with the following hardware:
+---
 
-| Component | Purpose |
+## How the Pi and desktop talk
+
+```
+[ Rosemount TT ] --4–20 mA--> [ shunt + ADS1115 ]
+                                    |
+                                  I²C
+                                    |
+                            [ Raspberry Pi ]
+                            dcs_server.py
+                               |      |
+                          terminal   WebSocket :8765
+                                         |
+                                   [ Desktop app ]
+                                      Electron
+```
+
+- **On the Pi:** `python3 dcs_server.py` samples the ADS1115, prints a terminal readout, and serves `ws://0.0.0.0:8765`.
+- **On the desktop:** the Electron app connects to `ws://<pi-ip>:8765`, shows TT-103, loop current, shunt voltage, and a scrolling terminal-style log.
+- **Without hardware:** run `simulator/` on your laptop — same JSON protocol — and point the app at `ws://127.0.0.1:8765`.
+
+Payload example:
+
+```json
+{
+  "type": "reading",
+  "temperature_c": 23.5,
+  "voltage_v": 0.976,
+  "current_ma": 9.76,
+  "pump": "off"
+}
+```
+
+Optional pump commands (GPIO 17 relay): `{"command":"pump","state":"on"}`.
+
+---
+
+## Repository layout
+
+```
+DCS/
+├── desktop-app/          # Electron + React UI
+├── raspberry-pi/         # ADS1115 reader + WebSocket service
+├── simulator/            # LAN-free stand-in for the Pi service
+├── docs/hardware/        # Schematics + pinout + notes
+└── README.md
+```
+
+---
+
+## Hardware
+
+| Part | Notes |
 |---|---|
-| **ADS1115** | 16-bit analog-to-digital converter — reads analog sensor values over I²C |
-| **Adafruit 757 Logic Level Converter (4CH)** | Safely bridges 3.3V (Pi GPIO) and 5V signals from external components |
+| Raspberry Pi (any with I²C) | Enable I²C in `raspi-config` |
+| [ADS1115](https://www.adafruit.com/product/1085) | Addr `0x48` (ADDR→GND) |
+| 100 Ω ±0.1% shunt | 4–20 mA → 0.4–2.0 V |
+| 24 VDC supply | Loop power for the transmitter |
+| Rosemount temperature transmitter | 2-wire 4–20 mA |
+| [Adafruit 757 LLC](https://www.adafruit.com/product/757) | Only if the ADS runs at 5 V |
+| Breadboard + cobbler **or** soldered / flex proto PCB | Same netlist |
 
----
+### Exact pinout
 
-## Architecture
+| Pi header | Signal | Goes to |
+|---|---|---|
+| Pin 1 (3V3) | Power | ADS1115 VDD |
+| Pin 3 (GPIO2) | SDA | ADS1115 SDA |
+| Pin 5 (GPIO3) | SCL | ADS1115 SCL |
+| Pin 6 (GND) | Ground | ADS1115 GND + **shunt low** |
+| Pin 11 (GPIO17) | Optional pump relay | Relay IN (active-low) |
 
-```
-[ Desktop App ]
-      |
-   TCP/Serial/WebSocket
-      |
-[ Raspberry Pi ]
-      |
-  I²C / GPIO
-      |
-[ ADS1115 ] ──── Analog sensors
-[ Logic Level Converter ] ──── 5V peripherals
-```
+**Loop:** `+24 V` → Rosemount `+` → Rosemount `−` → **shunt high** → ADS1115 **AIN0**; **shunt low** → `24 V−` and ADC/Pi GND (single star).
 
----
+Drawings (title block + revision A):
 
-## Features
+- [`docs/hardware/schematic-overview.svg`](docs/hardware/schematic-overview.svg) — SCH-DCS-001
+- [`docs/hardware/pinout.svg`](docs/hardware/pinout.svg) — SCH-DCS-002
+- [`docs/hardware/hardware-notes.md`](docs/hardware/hardware-notes.md)
 
-- 📡 **Real-time data** — Reads and displays live sensor values from the ADS1115 ADC
-- 🎛️ **Send commands** — Control outputs and settings on the Pi from the desktop
-- 📊 **Dashboard** — Visual monitor for system state
-- ⚙️ **Configuration** — Adjust parameters without touching the Pi directly
-- 🧪 **Simulator** — Test and develop without physical hardware
-
----
-
-## Hardware Requirements
-
-- Raspberry Pi (any model with GPIO + I²C support)
-- [ADS1115 16-bit ADC](https://www.adafruit.com/product/1085) — wired to I²C (SDA/SCL)
-- [Adafruit 757 4-Channel Logic Level Converter](https://www.adafruit.com/product/757)
-- Custom breakout board (hand-soldered)
-
-### Pi Setup
-
-Enable I²C on the Raspberry Pi:
+### Check the ADC
 
 ```bash
-sudo raspi-config
-# Interface Options → I2C → Enable
-```
-
-Verify the ADS1115 is detected:
-
-```bash
+sudo raspi-config   # Interface Options → I2C → Enable
+sudo apt install i2c-tools
 sudo i2cdetect -y 1
-# Should show device at address 0x48 (default)
+# expect device at 0x48
 ```
 
 ---
 
-## Getting Started
+## Run on the Raspberry Pi
 
-### Desktop App
+```bash
+cd raspberry-pi
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python3 dcs_server.py
+```
+
+You should see a live terminal stream like:
+
+```text
+TT   23.41 °C   I= 9.760 mA   V=0.9760 V   pump=off
+```
+
+Demo without the ADS1115:
+
+```bash
+python3 dcs_server.py --demo
+```
+
+Optional systemd unit: `raspberry-pi/dcs.service` (edit paths for your Pi user).
+
+Useful env vars: `DCS_WS_PORT`, `DCS_SHUNT_OHMS`, `DCS_LRV_C`, `DCS_URV_C`, `DCS_ADS_ADDR`, `DCS_ADC_CHANNEL`.
+
+---
+
+## Run the desktop app
 
 ```bash
 cd desktop-app
@@ -82,35 +143,42 @@ npm install
 npm start
 ```
 
-### Simulator
+This starts the React dev server and opens Electron. Set the WebSocket URL in the side panel (default `ws://127.0.0.1:8765` on localhost, or your Pi LAN IP).
+
+Web-only (no Electron window):
+
+```bash
+npm run start:web
+```
+
+Production build:
+
+```bash
+npm run build
+```
+
+---
+
+## Run the simulator (no Pi)
 
 ```bash
 cd simulator
 npm install
 npm start
+# ws://127.0.0.1:8765 — same protocol as the Pi service
 ```
 
----
-
-## Project Structure
-
-```
-DCS/
-├── desktop-app/     # Electron desktop application
-│   └── ...
-├── simulator/       # Software simulator for offline development
-│   └── ...
-└── README.md
-```
+Then start the desktop app and leave the WS URL at `ws://127.0.0.1:8765`.
 
 ---
 
 ## Notes
 
-This is a personal project built for my own hardware setup. The custom breakout board and wiring are specific to my configuration — your pinout and I²C addresses may differ. Feel free to adapt it to your own Pi setup.
+- Temperature on TT-103 comes from the Pi/simulator stream. Tank level / flow / pressure remain local process-view animation driven by the pump control (same idea as the original dashboard).
+- Keep 24 V loop grounding at the shunt low side; prefer an isolated loop supply.
 
 ---
 
 ## License
 
-Personal project — no license applied. Feel free to use as inspiration.
+Personal project — no license applied. Use as inspiration; adapt the pinout to your board.

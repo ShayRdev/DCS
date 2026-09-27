@@ -1,0 +1,11 @@
+node_modules/
+desktop-app/node_modules/
+simulator/node_modules/
+desktop-app/build/
+desktop-app/dist/
+__pycache__/
+*.pyc
+.env
+.DS_Store
+*.log
+.cache/
