@@ -2,7 +2,17 @@
 
 Personal portfolio project: a **Raspberry Pi** reads a **Rosemount temperature transmitter** through an **ADS1115** (I²C), prints live values in the terminal, and streams them to an **Electron** desktop app over the LAN.
 
-Built and verified on real hardware (Pi + ADS1115 + Rosemount 4–20 mA loop). Anyone with a Pi, breadboard, and the parts below can reproduce it.
+Built and verified on real hardware (Pi + ADS1115 + Rosemount 4–20 mA loop). Anyone with a Pi, breadboard or junction-box parts, and the BOM below can reproduce it.
+
+---
+
+## Desktop app
+
+Live Rosemount TT-103 readout (demo / simulator link) and pump control:
+
+![DCS dashboard — live temperature and terminal readout](docs/images/dcs_dashboard_live.png)
+
+![DCS dashboard — pump running](docs/images/dcs_dashboard_pump_on.png)
 
 ---
 
@@ -37,6 +47,10 @@ Default scale: **4 mA → 0 °C**, **20 mA → 100 °C** (match your transmitter
 - **On the desktop:** the Electron app connects to `ws://<pi-ip>:8765`, shows TT-103, loop current, shunt voltage, and a scrolling terminal-style log.
 - **Without hardware:** run `simulator/` on your laptop — same JSON protocol — and point the app at `ws://127.0.0.1:8765`.
 
+### Why WebSocket
+
+WebSocket is the remote HMI path: view live readings from another machine on the LAN without SSH or a serial cable. The Pi keeps sampling and printing to its own terminal even if the desktop disconnects. If the link drops, the UI goes blind (shows **Pi link lost**) and reconnects with backoff until the service is reachable again. That failure mode is expected for a LAN viewer — not a reason to force serial for remote desktop use.
+
 Payload example:
 
 ```json
@@ -60,27 +74,50 @@ DCS/
 ├── desktop-app/          # Electron + React UI
 ├── raspberry-pi/         # ADS1115 reader + WebSocket service
 ├── simulator/            # LAN-free stand-in for the Pi service
-├── docs/hardware/        # Schematics + pinout + notes
+├── docs/
+│   ├── hardware/         # PDF schematics + notes
+│   └── images/           # App screenshots + BOM illustration
 └── README.md
 ```
 
 ---
 
-## Hardware
+## Parts / BOM
+
+### Amazon (this build)
+
+| Item | ASIN / link | Role |
+|---|---|---|
+| **OONO Ultra-Small RPi GPIO Terminal Block Breakout** | [B084C69VSQ](https://www.amazon.com/dp/B084C69VSQ) | Screw-terminal HAT on the Pi 40-pin header for field wiring (SDA/SCL/3V3/GND/GPIO17) |
+| **Mean Well HDR-15-24** 15 W ultra-slim DIN-rail PSU (24 VDC / 0.63 A) | [B0C9C4LNR4](https://www.amazon.com/dp/B0C9C4LNR4) | Isolated-style 24 V loop supply for the Rosemount transmitter |
+| **PT 4-HESI (5×20) fuse terminal blocks** (Phoenix-style, pack) | [B0D59WVSKS](https://www.amazon.com/dp/B0D59WVSKS) | Fused terminal protection on the 4–20 mA / 24 V loop |
+
+### Core sensing stack
 
 | Part | Notes |
 |---|---|
 | Raspberry Pi (any with I²C) | Enable I²C in `raspi-config` |
 | [ADS1115](https://www.adafruit.com/product/1085) | Addr `0x48` (ADDR→GND) |
 | 100 Ω ±0.1% shunt | 4–20 mA → 0.4–2.0 V |
-| 24 VDC supply | Loop power for the transmitter |
 | Rosemount temperature transmitter | 2-wire 4–20 mA |
 | [Adafruit 757 LLC](https://www.adafruit.com/product/757) | Only if the ADS runs at 5 V |
-| Breadboard + cobbler **or** soldered / flex proto PCB | Same netlist |
+| Breadboard + jumpers **or** junction box / soldered proto | Same netlist |
+
+### BOM layout illustration
+
+AI-generated composite of the real parts above in a small junction box (not a photograph of the bench):
+
+![Illustration — BOM layout in junction box](docs/images/dcs_bom_junction_box_illustration.png)
+
+*Illustration — BOM layout (not a photograph).*
+
+---
+
+## Hardware wiring
 
 ### Exact pinout
 
-| Pi header | Signal | Goes to |
+| Pi header (via OONO TB) | Signal | Goes to |
 |---|---|---|
 | Pin 1 (3V3) | Power | ADS1115 VDD |
 | Pin 3 (GPIO2) | SDA | ADS1115 SDA |
@@ -88,13 +125,15 @@ DCS/
 | Pin 6 (GND) | Ground | ADS1115 GND + **shunt low** |
 | Pin 11 (GPIO17) | Optional pump relay | Relay IN (active-low) |
 
-**Loop:** `+24 V` → Rosemount `+` → Rosemount `−` → **shunt high** → ADS1115 **AIN0**; **shunt low** → `24 V−` and ADC/Pi GND (single star).
+**Loop:** `+24 V` (HDR-15-24, optional fuse TB) → Rosemount `+` → Rosemount `−` → **shunt high** → ADS1115 **AIN0**; **shunt low** → `24 V−` and ADC/Pi GND (single star).
 
-Drawings (title block + revision A):
+### Schematics (PDF)
 
-- [`docs/hardware/schematic-overview.svg`](docs/hardware/schematic-overview.svg) — SCH-DCS-001
-- [`docs/hardware/pinout.svg`](docs/hardware/pinout.svg) — SCH-DCS-002
-- [`docs/hardware/hardware-notes.md`](docs/hardware/hardware-notes.md)
+GitHub does **not** inline PDF drawings in Markdown image tags — **open the PDF files** in the repo:
+
+- [docs/hardware/schematic-overview.pdf](docs/hardware/schematic-overview.pdf) — **SCH-DCS-001** rev B (system interconnect)
+- [docs/hardware/pinout.pdf](docs/hardware/pinout.pdf) — **SCH-DCS-002** rev B (pinout & terminals)
+- [docs/hardware/hardware-notes.md](docs/hardware/hardware-notes.md)
 
 ### Check the ADC
 
@@ -175,7 +214,7 @@ Then start the desktop app and leave the WS URL at `ws://127.0.0.1:8765`.
 ## Notes
 
 - Temperature on TT-103 comes from the Pi/simulator stream. Tank level / flow / pressure remain local process-view animation driven by the pump control (same idea as the original dashboard).
-- Keep 24 V loop grounding at the shunt low side; prefer an isolated loop supply.
+- Keep 24 V loop grounding at the shunt low side; prefer an isolated loop supply (HDR-15-24).
 
 ---
 

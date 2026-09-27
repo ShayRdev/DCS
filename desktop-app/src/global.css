@@ -127,6 +127,16 @@ input {
   background: var(--bg-panel);
 }
 
+.conn.lost {
+  border-color: rgba(212, 91, 91, 0.55);
+  color: #f0b4b4;
+  background: rgba(212, 91, 91, 0.08);
+}
+
+.conn.live {
+  border-color: rgba(92, 188, 122, 0.45);
+}
+
 .conn-dot {
   width: 8px;
   height: 8px;
@@ -137,6 +147,23 @@ input {
 .conn-dot.ok {
   background: var(--ok);
   animation: pulse-live 1.6s ease-in-out infinite;
+}
+
+.link-banner {
+  margin: 0;
+  padding: 10px 28px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  color: #f0b4b4;
+  background: rgba(212, 91, 91, 0.12);
+  border-bottom: 1px solid rgba(212, 91, 91, 0.35);
+}
+
+@media (max-width: 960px) {
+  .link-banner {
+    padding: 10px 16px;
+  }
 }
 
 .layout {

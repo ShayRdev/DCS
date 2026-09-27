@@ -1,6 +1,8 @@
 # Hardware notes — DCS
 
-Revision **A** · 2026-09-27 · companions: `schematic-overview.svg` (SCH-DCS-001), `pinout.svg` (SCH-DCS-002)
+Revision **B** · 2026-09-27 · companions: `schematic-overview.pdf` (SCH-DCS-001), `pinout.pdf` (SCH-DCS-002)
+
+Open the **PDF** drawings in this folder (GitHub does not render PDF as inline Markdown images).
 
 ## What this measured on the bench
 
@@ -12,27 +14,38 @@ This is a personal portfolio build — not a commercial product brand.
 
 ```
 Rosemount TT (4–20 mA)
-    → 24 VDC loop supply
+    → 24 VDC loop supply (Mean Well HDR-15-24)
+    → optional fuse TB (PT 4-HESI 5×20)
     → 100 Ω shunt
     → voltage into ADS1115 AIN0
-    → I²C (Pi GPIO2/SDA, GPIO3/SCL, addr 0x48)
+    → I²C (Pi GPIO2/SDA, GPIO3/SCL via OONO GPIO terminal HAT, addr 0x48)
     → raspberry-pi/dcs_server.py
          ├─ terminal printout
          └─ WebSocket ws://<pi-ip>:8765
               → desktop-app (DCS)
 ```
 
-## Parts
+## Parts / BOM
+
+### Amazon (this build)
+
+| Part | Link | Role |
+|---|---|---|
+| OONO Ultra-Small RPi GPIO Terminal Block Breakout | https://www.amazon.com/dp/B084C69VSQ | Screw terminals on Pi GPIO |
+| Mean Well HDR-15-24 15 W DIN-rail 24 VDC | https://www.amazon.com/dp/B0C9C4LNR4 | Transmitter loop supply |
+| PT 4-HESI (5×20) fuse terminal blocks | https://www.amazon.com/dp/B0D59WVSKS | Loop fuse / TB |
+
+### Sensing stack
 
 | Part | Role |
 |---|---|
 | Raspberry Pi (I²C capable) | Runs `dcs_server.py` |
 | ADS1115 breakout | 16-bit ADC |
 | 100 Ω ±0.1% shunt | 4–20 mA → 0.4–2.0 V |
-| 24 VDC supply | Transmitter loop power |
 | Rosemount temperature transmitter | 4–20 mA process input |
 | Adafruit 757 LLC (optional) | Only if ADS1115 is run at 5 V |
-| Dupont / cobbler **or** soldered proto / flex PCB | Mechanical interconnect |
+
+See also `docs/images/dcs_bom_junction_box_illustration.png` (labeled **illustration**, not a photograph).
 
 ## Pinout (copy)
 
@@ -56,11 +69,15 @@ Default software scale (override with env / flags on the Pi service):
 
 Match LRV/URV to the transmitter’s configured range.
 
-## Breadboard vs soldered
+## Breadboard vs junction box
 
-**Breadboard:** Pi cobbler → ADS1115 module; shunt between AIN0 and GND; screw-terminal or clip leads to the Rosemount and 24 V supply.
+**Breadboard:** Pi + OONO GPIO TB → ADS1115 module; shunt between AIN0 and GND; leads to the Rosemount and 24 V supply.
 
-**Soldered / flex PCB:** Same netlist. Mount ADS1115 + shunt on proto or a small flex/rigid board with screw terminals for the loop. Keep the shunt Kelvin connection short.
+**Junction box / soldered:** Same netlist. Fuse TB on the loop, DIN PSU, screw terminals for field cable. Keep the shunt connection short.
+
+## WebSocket note
+
+LAN WebSocket is intentional for remote desktop viewing. If the link drops, the UI is blind until reconnect; the Pi continues sampling and printing locally.
 
 ## Safety / grounding
 
