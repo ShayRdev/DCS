@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="780" viewBox="0 0 1100 780">
+  <defs>
+    <style>
+      .title { font: 700 18px 'IBM Plex Sans', Arial, sans-serif; fill: #1a1a1a; }
+      .sub { font: 500 12px 'IBM Plex Sans', Arial, sans-serif; fill: #333; }
+      .label { font: 500 11px 'IBM Plex Sans', Arial, sans-serif; fill: #111; }
+      .small { font: 400 10px 'IBM Plex Mono', monospace; fill: #222; }
+      .wire { fill: none; stroke: #111; stroke-width: 2; }
+      .wire-power { fill: none; stroke: #b33; stroke-width: 2.2; }
+      .wire-gnd { fill: none; stroke: #1a5; stroke-width: 2.2; }
+      .wire-sig { fill: none; stroke: #146; stroke-width: 2; }
+      .box { fill: #f7f7f4; stroke: #111; stroke-width: 1.6; }
+      .tb { fill: #efefea; stroke: #111; stroke-width: 1; }
+    </style>
+  </defs>
+
+  <!-- Drawing frame -->
+  <rect x="24" y="24" width="1052" height="732" fill="#fbfbf8" stroke="#111" stroke-width="2"/>
+  <rect x="24" y="24" width="1052" height="56" fill="#ecece6" stroke="#111" stroke-width="2"/>
+  <text class="title" x="40" y="48">DCS  System Interconnect Schematic</text>
+  <text class="sub" x="40" y="68">Raspberry Pi ∑ ADS1115 ∑ Rosemount 420 mA Temperature Transmitter</text>
+
+  <!-- Title block -->
+  <g transform="translate(740,640)">
+    <rect class="tb" x="0" y="0" width="312" height="92"/>
+    <line x1="0" y1="28" x2="312" y2="28" stroke="#111"/>
+    <line x1="0" y1="56" x2="312" y2="56" stroke="#111"/>
+    <line x1="160" y1="0" x2="160" y2="92" stroke="#111"/>
+    <text class="small" x="8" y="18">DOCUMENT</text>
+    <text class="label" x="8" y="46">SCH-DCS-001</text>
+    <text class="small" x="168" y="18">REVISION</text>
+    <text class="label" x="168" y="46">A</text>
+    <text class="small" x="8" y="74">DATE 2026-09-27</text>
+    <text class="small" x="168" y="74">SHEET 1 OF 2</text>
+  </g>
+
+  <!-- Rosemount -->
+  <rect class="box" x="70" y="140" width="200" height="120" rx="4"/>
+  <text class="label" x="90" y="168">ROSEMOUNT</text>
+  <text class="label" x="90" y="186">TEMP TRANSMITTER</text>
+  <text class="small" x="90" y="210">2-wire 420 mA</text>
+  <text class="small" x="90" y="226">Loop-powered</text>
+  <text class="small" x="90" y="242">TT-103</text>
+
+  <!-- 24V supply -->
+  <rect class="box" x="70" y="320" width="200" height="80" rx="4"/>
+  <text class="label" x="90" y="350">24 VDC LOOP SUPPLY</text>
+  <text class="small" x="90" y="372">Isolated preferred</text>
+  <text class="small" x="90" y="388">+  ∑  </text>
+
+  <!-- Shunt -->
+  <rect class="box" x="360" y="170" width="160" height="90" rx="4"/>
+  <text class="label" x="380" y="200">SHUNT Rs</text>
+  <text class="small" x="380" y="220">100 ©  ±0.1%</text>
+  <text class="small" x="380" y="238">0.42.0 V @ 420 mA</text>
+
+  <!-- ADS1115 -->
+  <rect class="box" x="600" y="150" width="200" height="140" rx="4"/>
+  <text class="label" x="620" y="178">ADS1115 ADC</text>
+  <text class="small" x="620" y="200">I≤C addr 0x48</text>
+  <text class="small" x="620" y="218">AIN0 ê shunt high</text>
+  <text class="small" x="620" y="236">GND  ê shunt low</text>
+  <text class="small" x="620" y="254">VDD = 3.3 V</text>
+  <text class="small" x="620" y="272">SDA / SCL</text>
+
+  <!-- LLC -->
+  <rect class="box" x="600" y="340" width="200" height="100" rx="4"/>
+  <text class="label" x="620" y="368">LOGIC LEVEL</text>
+  <text class="label" x="620" y="386">CONVERTER (opt.)</text>
+  <text class="small" x="620" y="408">Adafruit 757 4-CH</text>
+  <text class="small" x="620" y="424">If ADS VDD = 5 V</text>
+
+  <!-- Pi -->
+  <rect class="box" x="860" y="170" width="180" height="200" rx="4"/>
+  <text class="label" x="880" y="200">RASPBERRY PI</text>
+  <text class="small" x="880" y="224">GPIO2  SDA</text>
+  <text class="small" x="880" y="242">GPIO3  SCL</text>
+  <text class="small" x="880" y="260">3V3 / GND</text>
+  <text class="small" x="880" y="278">GPIO17 pump relay</text>
+  <text class="small" x="880" y="304">dcs_server.py</text>
+  <text class="small" x="880" y="322">ws://Pi:8765</text>
+  <text class="small" x="880" y="348">Desktop app</text>
+
+  <!-- Wires: 24V+ to Rosemount -->
+  <path class="wire-power" d="M170 320 V260"/>
+  <text class="small" x="176" y="290">+24V</text>
+  <!-- Rosemount return to shunt -->
+  <path class="wire-sig" d="M270 200 H360"/>
+  <text class="small" x="300" y="192">LOOP+</text>
+  <!-- Shunt low to supply  and ADS GND -->
+  <path class="wire-gnd" d="M440 260 V400 H170 V400"/>
+  <path class="wire-gnd" d="M440 260 H520 V290 H600"/>
+  <text class="small" x="470" y="280">LOOP / GND</text>
+  <!-- Shunt high to AIN0 -->
+  <path class="wire-sig" d="M520 200 H600"/>
+  <text class="small" x="540" y="192">AIN0</text>
+  <!-- I2C to Pi (direct 3V3 path) -->
+  <path class="wire" d="M800 210 H860"/>
+  <path class="wire" d="M800 230 H860"/>
+  <text class="small" x="812" y="204">SDA</text>
+  <text class="small" x="812" y="248">SCL</text>
+  <!-- Optional LLC path annotation -->
+  <path class="wire" d="M700 290 V340" stroke-dasharray="4 3"/>
+  <text class="small" x="708" y="320">5 V path only</text>
+
+  <!-- Notes -->
+  <text class="small" x="70" y="460">NOTES</text>
+  <text class="small" x="70" y="480">1. Default shunt 100 © keeps 20 mA d 2.0 V within ADS1115 ±4.096 V FSR (PGA).</text>
+  <text class="small" x="70" y="496">2. Enable I≤C on the Pi (`raspi-config`). Confirm 0x48 with `i2cdetect -y 1`.</text>
+  <text class="small" x="70" y="512">3. Desktop app connects over LAN WebSocket; Pi prints the same readout to the terminal.</text>
+  <text class="small" x="70" y="528">4. Breadboard build uses Dupont jumpers; soldered build may use a flex / proto PCB for ADS + shunt.</text>
+  <text class="small" x="70" y="544">5. Do not share 24 V loop return with Pi 5 V rails without isolation  keep loop GND star at shunt low.</text>
+
+  <text class="small" x="70" y="600">REF: docs/hardware/hardware-notes.md ∑ pinout.svg (SCH-DCS-002)</text>
+</svg>

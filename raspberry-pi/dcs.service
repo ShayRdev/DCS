@@ -1,0 +1,17 @@
+[Unit]
+Description=DCS Raspberry Pi ADS1115 / Rosemount WebSocket service
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/pi/DCS/raspberry-pi
+ExecStart=/home/pi/DCS/raspberry-pi/.venv/bin/python /home/pi/DCS/raspberry-pi/dcs_server.py
+Restart=on-failure
+RestartSec=3
+Environment=DCS_WS_PORT=8765
+Environment=DCS_SHUNT_OHMS=100
+Environment=DCS_LRV_C=0
+Environment=DCS_URV_C=100
+
+[Install]
+WantedBy=multi-user.target
