@@ -1,6 +1,6 @@
 # DCS — Wire-level connections (SKiDL / KiCad input)
 
-**Revision:** D · **Date:** 2026-09-28  
+**Revision:** E · **Date:** 2026-09-28  
 **Audience:** Downstream schematic generation (SKiDL / KiCad). This file is the **netlist truth** in Markdown. Prefer this over PDF drawings for automated schematic build.
 
 **Project one-liner:** Raspberry Pi 4 reads a Rosemount 2-wire 4–20 mA temperature transmitter through a **250 Ω** shunt into an **ADS1115** (5 V), with I²C crossing a blue **4 Bi-Directional Level Shifters** module on a green perfboard HAT; `dcs_server.py` prints `V` / `I` / `%Span` and serves WebSocket `:8765` to the desktop app.
@@ -18,7 +18,8 @@
 
 | Rail net | Nominal | Source | Used by |
 |---|---|---|---|
-| `+24V_LOOP` | 24 VDC | Mean Well DIN-rail PSU output `+V` (HDR-15-24 family) | Rosemount loop supply + |
+| `+24V_PSU` | 24 VDC | Mean Well DIN-rail PSU output `+V` (HDR-15-24 family) | Feed into `F1` fuse TB only |
+| `+24V_LOOP` | 24 VDC | **After `F1`** (PT 4-HESI) | Rosemount loop supply + |
 | `0V_LOOP` | 24 V return | Mean Well `−V` | Loop return; **starred** with signal GND at shunt-low / brass bar |
 | `+5V_ADS` | 5 VDC | **Pi 5 V header** (physical pin 2 or 4) → LLC `HV` and ADS1115 `VDD` — *see TODO if a separate 5 V regulator was used* | ADS1115 VDD, LLC HV |
 | `+3V3_PI` | 3.3 VDC | Pi header pin 1 (`3V3`) | LLC `LV` |
@@ -31,10 +32,11 @@
 ## 2. Block list (named nets between blocks)
 
 ```
-[AC mains] --L/N/PE--> [PSU_MW Mean Well] --+24V_LOOP / 0V_LOOP--> [loop]
+[AC mains] --L/N/PE--> [PSU_MW Mean Well] --+24V_PSU--> [F1 PT 4-HESI] --+24V_LOOP--> [loop]
+                                          --0V_LOOP / GND star----------^
 
 [TT_RM Rosemount 2-wire]
-    LOOP+ <--+24V_LOOP
+    LOOP+ <--+24V_LOOP   (after F1)
     LOOP- --> NET_LOOP_RETURN --> [RS250 shunt high] --> NET_SHUNT_HIGH --> [U_ADS AIN0]
                               --> [RS250 shunt low]  --> GND (star)
 
@@ -60,7 +62,7 @@
 **Physical carriers (not separate electrical blocks, but required for layout):**
 - `J_GPIO` — green GPIO screw-terminal breakout on Pi 40-pin header (OONO-style / equiv.)
 - `PCB_PERF` — green perfboard HAT on standoffs; hosts `U_LLC` (soldered) and jumpers to ADS / shunt sense
-- `DIN` — aluminum DIN rail: `PSU_MW`, brass ground bar, black DIN terminal blocks
+- `DIN` — aluminum DIN rail: `PSU_MW`, **`F1` PT 4-HESI fuse TB**, brass ground bar, black DIN terminal blocks
 
 ---
 
@@ -69,28 +71,29 @@
 Columns: **From** → **To**, **Net**, **Notes**.  
 Ref designators are logical (`U_PI`, `U_LLC`, …), not KiCad library IDs.
 
-### 3.1 Power — Mean Well → loop
+### 3.1 Power — Mean Well → fuse → loop
 
 | From | To | Net | Notes |
 |---|---|---|---|
 | AC L (mains) | `PSU_MW` AC L / Line input | `AC_L` | Photo: black/white into Mean Well top terminals — exact silkscreen labels `TODO / unverified` |
 | AC N (mains) | `PSU_MW` AC N / Neutral | `AC_N` | Same |
 | PE / green earth (if present) | Brass ground bar | `PE` | Photo shows green wire to brass bar |
-| `PSU_MW` `+V` | Rosemount `+` (LOOP+) **or** DIN TB → Rosemount `+` | `+24V_LOOP` | 24 VDC loop supply |
+| `PSU_MW` `+V` | `F1` fuse TB input (PT 4-HESI) | `+24V_PSU` | Unfused PSU +V into DIN fuse holder |
+| `F1` fuse TB output | `TT_RM` transmitter `+` (LOOP+) | `+24V_LOOP` | **Fused** 24 VDC loop supply — F1 in series before Rosemount |
 | `PSU_MW` `−V` | Brass bar / DIN TB → shunt low / star | `0V_LOOP` ≡ `GND` at star | Must meet shunt low |
 
 ### 3.2 4–20 mA process loop + 250 Ω shunt
 
 | From | To | Net | Notes |
 |---|---|---|---|
-| `+24V_LOOP` | `TT_RM` transmitter `+` | `+24V_LOOP` | 2-wire Rosemount |
+| `+24V_LOOP` (after F1) | `TT_RM` transmitter `+` | `+24V_LOOP` | 2-wire Rosemount |
 | `TT_RM` transmitter `−` | **Shunt high** (`RS250` pad A) | `NET_LOOP_RETURN` | Series in loop return |
 | `RS250` pad A (high) | `U_ADS` `AIN0` | `NET_SHUNT_HIGH` | Sense voltage; **this is “shunt high”** |
 | `RS250` pad B (low) | `GND` star (brass bar + ADS GND + Pi GND) | `GND` | **“Shunt low”** |
 | `RS250` | — | — | **250 Ω ±0.1%** (documented). Bench: `V≈2.00` @ `I≈8.02 mA` ⇒ R≈250 Ω. **Not 100 Ω.** |
 
 **Loop current path (series):**  
-`PSU +V` → `TT_RM +` → `TT_RM −` → **shunt** → `PSU −V` / star GND.
+`PSU +V` → **`F1`** → `TT_RM +` → `TT_RM −` → **shunt** → `PSU −V` / star GND.
 
 **Voltage measured by ADC:** across shunt = `I_loop × 250 Ω` → `AIN0` vs `GND`.
 
@@ -213,11 +216,28 @@ Photo silkscreen (confirmed):
 | Terminal | Net | Confirmed? |
 |---|---|---|
 | AC inputs | `AC_L` / `AC_N` | Yes functionally; label text on photo TODO |
-| `+V` | `+24V_LOOP` | Yes |
+| `+V` | `+24V_PSU` → into `F1` | Yes |
 | `−V` | `0V_LOOP` → star `GND` | Yes |
 | ASIN reference | [B0C9C4LNR4](https://www.amazon.com/dp/B0C9C4LNR4) | README BOM |
 
 Exact model faceplate on the wood board may be HDR vs DR series — treat as **24 V DIN Mean Well**; MPN faceplate: `TODO / unverified` if not HDR-15-24.
+
+### 4.5a `F1` — DIN fuse terminal block (PT 4-HESI, 5×20)
+
+**Confirmed BOM part** (README Amazon BOM). In series on the **+24 V feed before Rosemount**.
+
+| Terminal | Net | Notes |
+|---|---|---|
+| Input (PSU side) | `+24V_PSU` | From `PSU_MW` `+V` |
+| Output (loop side) | `+24V_LOOP` | To `TT_RM` `+` |
+| Fuse cartridge | 5×20 mm | Holder: Phoenix Contact–style **PT 4-HESI** |
+| Fuse amp rating | — | **`TODO / unverified`** — do not invent amperage; part presence is confirmed |
+
+| Spec | Value | Source |
+|---|---|---|
+| Designator | `F1` (schematic) / `FU_HESI` (logical) | This file |
+| Holder | PT 4-HESI (5×20) family | [Amazon B0D59WVSKS](https://www.amazon.com/dp/B0D59WVSKS) |
+| Series location | `PSU +V` → **F1** → Rosemount `+` | Confirmed intent / BOM |
 
 ### 4.6 `TT_RM` — Rosemount 2-wire temperature transmitter
 
@@ -291,7 +311,7 @@ Bench Mac capture matched `V=… V  I=… mA  %Span=…%` at ~25 / 50 / 75% poin
 | `U_ADS` | ADS1115 breakout @ 5 V, ADDR→GND = 0x48 | [Adafruit 1085](https://www.adafruit.com/product/1085) or equiv. |
 | `RS250` | 250 Ω ±0.1% shunt | **Not 100 Ω** |
 | `PSU_MW` | Mean Well DIN 24 VDC ~15 W | [Amazon B0C9C4LNR4](https://www.amazon.com/dp/B0C9C4LNR4) HDR-15-24 |
-| DIN fuse TB (optional) | PT 4-HESI (5×20) style | [Amazon B0D59WVSKS](https://www.amazon.com/dp/B0D59WVSKS) |
+| `F1` / `FU_HESI` | DIN fuse TB **PT 4-HESI** (5×20) — series in `+24V` feed before Rosemount | [Amazon B0D59WVSKS](https://www.amazon.com/dp/B0D59WVSKS). Fuse **amp rating** `TODO / unverified` |
 | — | Brass ground bar + DIN TBs | On rail |
 | `TT_RM` | Rosemount 2-wire 4–20 mA TT | Field instrument |
 | — | Fluke 789 ProcessMeter | Test only |
@@ -303,14 +323,14 @@ Bench Mac capture matched `V=… V  I=… mA  %Span=…%` at ~25 / 50 / 75% poin
 
 Must exist as named nets:
 
-- `+24V_LOOP`, `0V_LOOP` (bonded to `GND` at star)
+- `+24V_PSU` (PSU +V → F1 input), `+24V_LOOP` (F1 output → Rosemount +), `0V_LOOP` (bonded to `GND` at star)
 - `+5V_ADS`, `+3V3_PI`, `GND`
 - `I2C_SDA_3V3`, `I2C_SCL_3V3`, `I2C_SDA_5V`, `I2C_SCL_5V`
 - `NET_SHUNT_HIGH` (AIN0 / shunt high / Rosemount − into shunt)
 - `RELAY_DRV` (optional)
 
 **Key nets to get right first:**  
-`I2C_SDA_3V3`/`I2C_SCL_3V3` (Pi GPIO2/3) ↔ LLC ↔ `I2C_SDA_5V`/`I2C_SCL_5V` (ADS); **`NET_SHUNT_HIGH`** = shunt high → ADS `AIN0`; shunt low → `GND` star; shunt = **250 Ω**.
+`+24V_PSU` → **F1** → `+24V_LOOP`; `I2C_SDA_3V3`/`I2C_SCL_3V3` (Pi GPIO2/3) ↔ LLC ↔ `I2C_SDA_5V`/`I2C_SCL_5V` (ADS); **`NET_SHUNT_HIGH`** = shunt high → ADS `AIN0`; shunt low → `GND` star; shunt = **250 Ω**.
 
 ---
 
@@ -318,6 +338,7 @@ Must exist as named nets:
 
 | Item | Status |
 |---|---|
+| Fuse cartridge amp rating in `F1` (PT 4-HESI) | TODO / unverified — **holder is confirmed BOM**; do not invent amps |
 | Exact Mean Well faceplate MPN on wood board | TODO / unverified (family: 24 V DIN) |
 | Which Pi 5V pin (2 vs 4) feeds `+5V_ADS` | TODO / unverified |
 | ADS1115 breakout brand silkscreen | TODO / unverified |
@@ -325,7 +346,6 @@ Must exist as named nets:
 | Perfboard hole map / jumper colors per net | TODO / unverified |
 | Pump relay hardware present on bench | Optional / likely unwired |
 | Rosemount exact model number | TODO / unverified |
-| Fuse TB in series with loop on final build | Optional (Amazon part documented) |
 
 ---
 
@@ -340,6 +360,10 @@ Must exist as named nets:
 ## 10. Quick ASCII interconnect (summary)
 
 ```
+          +24V_PSU
+             |
+            [F1]  PT 4-HESI (amp TBD)
+             |
           +24V_LOOP
              |
           [TT_RM]

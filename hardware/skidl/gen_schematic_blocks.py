@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""SCH-DCS-003 Rev F — portfolio electrical schematic (IEEE/IEC symbols)."""
+"""SCH-DCS-003 Rev G — portfolio electrical schematic (IEEE/IEC symbols)."""
 
 from __future__ import annotations
 
@@ -33,7 +33,7 @@ def build_svg() -> str:
     L(
         f'''<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}">
-<title>DCS SCH-DCS-003 Rev F</title>
+<title>DCS SCH-DCS-003 Rev G</title>
 <desc>Electrical schematic from CONNECTIONS.md. Real component symbols.</desc>
 <defs>
 <style><![CDATA[
@@ -72,49 +72,62 @@ def build_svg() -> str:
     L(f'<rect class="sheet" x="24" y="24" width="{W-48}" height="{H-48}"/>')
     L('<text class="hdr" x="38" y="46">DCS process loop &amp; ADC interface</text>')
     L(
-        '<text class="note" x="38" y="59">CONNECTIONS.md rev D · SCH-DCS-003 rev F · IEEE/IEC symbols · unused pins omitted</text>'
+        '<text class="note" x="38" y="59">CONNECTIONS.md rev E · SCH-DCS-003 rev G · IEEE/IEC symbols · unused pins omitted</text>'
     )
 
     # ===== PS1 — screw-terminal strip (4 circles), not a fat card =====
-    # Layout: vertical stack of terminal circles with short stubs
     L('<g id="PS1">')
-    L('<text class="ref" x="48" y="150">PS1</text>')
-    L('<text class="val" x="48" y="162">Mean Well 24V DIN</text>')
-    # four terminals: L, N, +V, -V arranged as 2+2
-    # AC left column
-    for i, (lab, yy) in enumerate([("L", 190), ("N", 220)]):
-        term(70, yy)
-        wire(f"M 50 {yy} H 66")
-        L(f'<text class="pin" x="46" y="{yy+3}" text-anchor="end">{lab}</text>')
-    # DC right column  
+    L('<text class="ref" x="40" y="150">PS1</text>')
+    L('<text class="val" x="40" y="162">Mean Well 24V DIN</text>')
+    for lab, yy in [("L", 190), ("N", 220)]:
+        term(62, yy)
+        wire(f"M 44 {yy} H 58")
+        L(f'<text class="pin" x="40" y="{yy+3}" text-anchor="end">{lab}</text>')
     for lab, yy in [("+V", 190), ("-V", 250)]:
-        term(110, yy)
-        wire(f"M 114 {yy} H 130")
-        L(f'<text class="pin" x="92" y="{yy-6}">{lab}</text>')
-    # body outline light bracket linking terminals (minimal, not a filled box)
-    L('<path class="w" d="M 78 175 V 265 H 102 V 175" fill="none"/>')
-    L('<text class="note" x="48" y="280">PSU_MW · AC silk TBD</text>')
+        term(100, yy)
+        wire(f"M 104 {yy} H 118")
+        L(f'<text class="pin" x="82" y="{yy-6}">{lab}</text>')
+    L('<path class="w" d="M 70 175 V 265 H 92 V 175" fill="none"/>')
+    L('<text class="note" x="40" y="280">PSU_MW · AC silk TBD</text>')
     L("</g>")
-    ps1_vp = (130, 190)
-    ps1_vn = (130, 250)
+    ps1_vp = (118, 190)
+    ps1_vn = (118, 250)
+
+    # ===== F1 — IEC fuse (PT 4-HESI 5x20 holder) in +24 feed =====
+    # Horizontal fuse body between PS1 +V and J1 +
+    fx0, fx1, fy = 150, 210, 190
+    L('<g id="F1">')
+    L(f'<text class="ref" x="{fx0}" y="150">F1</text>')
+    L(f'<text class="val" x="{fx0}" y="162">PT 4-HESI</text>')
+    # lead-in / lead-out
+    wire(f"M {fx0} {fy} H {fx0+10}")
+    wire(f"M {fx1-10} {fy} H {fx1}")
+    # fuse rectangle + internal link
+    L(f'<rect class="symf" x="{fx0+10}" y="{fy-10}" width="{fx1-fx0-20}" height="20"/>')
+    L(f'<path class="wb" d="M {fx0+16} {fy} H {fx0+22} Q {fx0+30} {fy-7} {fx0+38} {fy} Q {fx0+46} {fy+7} {fx0+54} {fy} H {fx1-16}"/>')
+    L(f'<text class="note" x="{fx0}" y="218">5x20 · amp TBD</text>')
+    L(f'<text class="note" x="{fx0}" y="230">FU_HESI</text>')
+    L("</g>")
+    f1_in = (fx0, fy)
+    f1_out = (fx1, fy)
 
     # ===== J1 — 2-pin terminal =====
     L('<g id="J1">')
-    L('<text class="ref" x="210" y="150">J1</text>')
-    L('<text class="val" x="210" y="162">Rosemount TT</text>')
-    term(230, 190)
-    term(230, 230)
-    wire("M 214 190 H 226")
-    wire("M 234 230 H 250")
-    L('<text class="pin" x="238" y="186">+</text>')
-    L('<text class="pin" x="238" y="244">-</text>')
-    L('<text class="note" x="210" y="258">2-wire 4-20mA</text>')
+    L('<text class="ref" x="250" y="150">J1</text>')
+    L('<text class="val" x="250" y="162">Rosemount TT</text>')
+    term(270, 190)
+    term(270, 230)
+    wire("M 254 190 H 266")
+    wire("M 274 230 H 290")
+    L('<text class="pin" x="278" y="186">+</text>')
+    L('<text class="pin" x="278" y="244">-</text>')
+    L('<text class="note" x="250" y="258">2-wire 4-20mA</text>')
     L("</g>")
-    j1_p = (214, 190)
-    j1_m = (250, 230)
+    j1_p = (254, 190)
+    j1_m = (290, 230)
 
     # ===== R1 vertical zig-zag =====
-    rx = 330
+    rx = 370
     L('<g id="R1">')
     L(
         f'<path class="wb" d="M {rx} 230 V 242 l -10 7 20 11 -20 11 20 11 -20 11 10 7 V 340"/>'
@@ -126,7 +139,7 @@ def build_svg() -> str:
     r_hi, r_lo = (rx, 230), (rx, 340)
 
     # ===== U2 ADS1115 — slim IC, pins outside =====
-    u2x, u2y, u2w, u2h = 450, 145, 70, 140
+    u2x, u2y, u2w, u2h = 490, 145, 70, 140
     L('<g id="U2">')
     L(f'<rect class="symf" x="{u2x}" y="{u2y}" width="{u2w}" height="{u2h}"/>')
     # notch
@@ -156,7 +169,7 @@ def build_svg() -> str:
     u2_scl = (u2x + u2w + 12, u2y + 70)
 
     # ===== U3 LLC =====
-    u3x, u3y, u3w, u3h = 660, 145, 80, 140
+    u3x, u3y, u3w, u3h = 700, 145, 80, 140
     L('<g id="U3">')
     L(f'<rect class="symf" x="{u3x}" y="{u3y}" width="{u3w}" height="{u3h}"/>')
     L(
@@ -194,7 +207,7 @@ def build_svg() -> str:
     u3_gndr = (u3x + u3w + 12, u3y + 115)
 
     # ===== U1 Pi header as pin strip =====
-    u1x, u1y, u1w, u1h = 920, 130, 64, 175
+    u1x, u1y, u1w, u1h = 960, 130, 64, 175
     L('<g id="U1">')
     L(f'<rect class="symf" x="{u1x}" y="{u1y}" width="{u1w}" height="{u1h}"/>')
     # pin circles on left edge suggesting header
@@ -222,25 +235,30 @@ def build_svg() -> str:
     # ===== Wiring =====
     gnd_y = 480
 
-    # +24V_LOOP
-    wire(f"M {ps1_vp[0]} {ps1_vp[1]} H {j1_p[0]}")
+    # +24V_PSU: PS1 +V → F1 in
+    wire(f"M {ps1_vp[0]} {ps1_vp[1]} H {f1_in[0]}")
     j(*ps1_vp)
+    j(*f1_in)
+    L(f'<text class="net" x="120" y="{ps1_vp[1]-8}">+24V_PSU</text>')
+    # +24V_LOOP: F1 out → J1 +
+    wire(f"M {f1_out[0]} {f1_out[1]} H {j1_p[0]}")
+    j(*f1_out)
     j(*j1_p)
-    L(f'<text class="net" x="145" y="{ps1_vp[1]-8}">+24V_LOOP</text>')
-    L(f'<use href="#pwr" x="160" y="{ps1_vp[1]-20}"/>')
-    wire(f"M 160 {ps1_vp[1]-14} V {ps1_vp[1]}")
-    j(160, ps1_vp[1])
-    L(f'<text class="net" x="168" y="{ps1_vp[1]-22}">+24V</text>')
+    L(f'<text class="net" x="215" y="{f1_out[1]-8}">+24V_LOOP</text>')
+    L(f'<use href="#pwr" x="228" y="{f1_out[1]-20}"/>')
+    wire(f"M 228 {f1_out[1]-14} V {f1_out[1]}")
+    j(228, f1_out[1])
+    L(f'<text class="net" x="236" y="{f1_out[1]-22}">+24V</text>')
 
     # J1- to R1 high — need to route: J1- is at y=230, R1 high at 230
     wire(f"M {j1_m[0]} {j1_m[1]} H {rx}")
     j(*j1_m)
     j(*r_hi)
-    L(f'<text class="net" x="260" y="{r_hi[1]-8}">NET_SHUNT_HIGH</text>')
+    L(f'<text class="net" x="300" y="{r_hi[1]-8}">NET_SHUNT_HIGH</text>')
 
     # Branch to AIN0
-    wire(f"M {rx} {r_hi[1]} H 400 V {u2_ain0[1]} H {u2_ain0[0]}")
-    j(400, r_hi[1])
+    wire(f"M {rx} {r_hi[1]} H 440 V {u2_ain0[1]} H {u2_ain0[0]}")
+    j(440, r_hi[1])
     j(*u2_ain0)
 
     # R1 low to GND
@@ -248,7 +266,7 @@ def build_svg() -> str:
     j(rx, gnd_y)
 
     # GND rail
-    wire(f"M 55 {gnd_y} H 1050", "wb")
+    wire(f"M 55 {gnd_y} H 1100", "wb")
     L(f'<text class="net" x="60" y="{gnd_y-7}">GND</text>')
     L(f'<use href="#gnd" x="{rx}" y="{gnd_y}"/>')
     L(f'<text class="note" x="{rx+14}" y="{gnd_y+16}">star @ shunt-low / brass bar</text>')
@@ -260,77 +278,77 @@ def build_svg() -> str:
     L('<text class="note" x="150" y="312">bonded to GND</text>')
 
     # U2 GND/ADDR
-    wire(f"M {u2_gnd[0]} {u2_gnd[1]} H 430 V {gnd_y}")
-    j(430, gnd_y)
-    wire(f"M {u2_addr[0]} {u2_addr[1]} H 422 V {u2_gnd[1]}")
-    j(422, u2_gnd[1])
-    L(f'<text class="net" x="405" y="{u2_addr[1]-6}">GND</text>')
+    wire(f"M {u2_gnd[0]} {u2_gnd[1]} H 470 V {gnd_y}")
+    j(470, gnd_y)
+    wire(f"M {u2_addr[0]} {u2_addr[1]} H 462 V {u2_gnd[1]}")
+    j(462, u2_gnd[1])
+    L(f'<text class="net" x="445" y="{u2_addr[1]-6}">GND</text>')
 
     # U3 / U1 GND
-    wire(f"M {u3_gndl[0]} {u3_gndl[1]} H 640 V {gnd_y}")
-    j(640, gnd_y)
-    wire(f"M {u3_gndr[0]} {u3_gndr[1]} H 770 V {gnd_y}")
-    j(770, gnd_y)
-    wire(f"M {u1_gnd[0]} {u1_gnd[1]} H 900 V {gnd_y}")
-    j(900, gnd_y)
+    wire(f"M {u3_gndl[0]} {u3_gndl[1]} H 680 V {gnd_y}")
+    j(680, gnd_y)
+    wire(f"M {u3_gndr[0]} {u3_gndr[1]} H 810 V {gnd_y}")
+    j(810, gnd_y)
+    wire(f"M {u1_gnd[0]} {u1_gnd[1]} H 940 V {gnd_y}")
+    j(940, gnd_y)
 
     # I2C 5V
     wire(f"M {u2_sda[0]} {u2_sda[1]} H {u3_b1[0]}")
     j(*u2_sda)
     j(*u3_b1)
-    L(f'<text class="net" x="545" y="{u2_sda[1]-7}">I2C_SDA_5V</text>')
+    L(f'<text class="net" x="585" y="{u2_sda[1]-7}">I2C_SDA_5V</text>')
     wire(f"M {u2_scl[0]} {u2_scl[1]} H {u3_b2[0]}")
     j(*u2_scl)
     j(*u3_b2)
-    L(f'<text class="net" x="545" y="{u2_scl[1]-7}">I2C_SCL_5V</text>')
+    L(f'<text class="net" x="585" y="{u2_scl[1]-7}">I2C_SCL_5V</text>')
 
     # I2C 3V3
     wire(f"M {u3_a1[0]} {u3_a1[1]} H {u1_sda[0]}")
     j(*u3_a1)
     j(*u1_sda)
-    L(f'<text class="net" x="780" y="{u3_a1[1]-7}">I2C_SDA_3V3</text>')
+    L(f'<text class="net" x="820" y="{u3_a1[1]-7}">I2C_SDA_3V3</text>')
     wire(f"M {u3_a2[0]} {u3_a2[1]} H {u1_scl[0]}")
     j(*u3_a2)
     j(*u1_scl)
-    L(f'<text class="net" x="780" y="{u3_a2[1]-7}">I2C_SCL_3V3</text>')
+    L(f'<text class="net" x="820" y="{u3_a2[1]-7}">I2C_SCL_3V3</text>')
 
     # +3V3
     wire(f"M {u1_3v3[0]} {u1_3v3[1]} H {u3_lv[0]}")
     j(*u1_3v3)
     j(*u3_lv)
-    L(f'<text class="net" x="800" y="{u1_3v3[1]-7}">+3V3_PI</text>')
-    L(f'<use href="#pwr" x="840" y="{u1_3v3[1]-26}"/>')
-    wire(f"M 840 {u1_3v3[1]-20} V {u1_3v3[1]}")
-    j(840, u1_3v3[1])
-    L(f'<text class="net" x="848" y="{u1_3v3[1]-28}">+3V3</text>')
+    L(f'<text class="net" x="840" y="{u1_3v3[1]-7}">+3V3_PI</text>')
+    L(f'<use href="#pwr" x="880" y="{u1_3v3[1]-26}"/>')
+    wire(f"M 880 {u1_3v3[1]-20} V {u1_3v3[1]}")
+    j(880, u1_3v3[1])
+    L(f'<text class="net" x="888" y="{u1_3v3[1]-28}">+3V3</text>')
 
     # +5V_ADS top rail
     rail_y = 110
-    wire(f"M {u1_5v[0]} {u1_5v[1]} H 890 V {rail_y} H 410")
-    j(890, rail_y)
+    wire(f"M {u1_5v[0]} {u1_5v[1]} H 930 V {rail_y} H 450")
+    j(930, rail_y)
     j(*u1_5v)
     L(f'<text class="net" x="600" y="{rail_y-7}">+5V_ADS</text>')
     L(f'<use href="#pwr" x="580" y="{rail_y-20}"/>')
     wire(f"M 580 {rail_y-14} V {rail_y}")
     j(580, rail_y)
     L(f'<text class="net" x="588" y="{rail_y-22}">+5V</text>')
-    wire(f"M 640 {rail_y} V {u3_hv[1]} H {u3_hv[0]}")
-    j(640, rail_y)
+    wire(f"M 680 {rail_y} V {u3_hv[1]} H {u3_hv[0]}")
+    j(680, rail_y)
     j(*u3_hv)
-    wire(f"M 410 {rail_y} V {u2_vdd[1]} H {u2_vdd[0]}")
-    j(410, rail_y)
+    wire(f"M 450 {rail_y} V {u2_vdd[1]} H {u2_vdd[0]}")
+    j(450, rail_y)
     j(*u2_vdd)
 
     # Legend + title block
     L(
         '''<g id="legend">
   <text class="tbb" x="38" y="540">Designators (CONNECTIONS.md)</text>
-  <text class="tb" x="38" y="554">PS1=PSU_MW · J1=TT_RM · R1=RS250 · U2=U_ADS · U3=U_LLC · U1=U_PI</text>
-  <text class="note" x="38" y="568">Omit Fluke / relay / software. No invented AIN1-3 or LLC unused ties. V=I*250R.</text>
+  <text class="tb" x="38" y="554">PS1=PSU_MW · F1=FU_HESI · J1=TT_RM · R1=RS250 · U2=U_ADS · U3=U_LLC · U1=U_PI</text>
+  <text class="note" x="38" y="568">F1 in +24 feed before Rosemount (amp TBD). Omit Fluke/relay/software. V=I*250R.</text>
 </g>'''
     )
 
-    tbx, tby = 1100, 520
+    tbx, tby = 1120, 520
     L(
         f'''<g id="tb">
   <rect class="symf" x="{tbx}" y="{tby}" width="360" height="150"/>
@@ -341,9 +359,9 @@ def build_svg() -> str:
   <line class="w" x1="{tbx+170}" y1="{tby+56}" x2="{tbx+170}" y2="{tby+150}"/>
   <line class="w" x1="{tbx+260}" y1="{tby+56}" x2="{tbx+260}" y2="{tby+150}"/>
   <text class="tbb" x="{tbx+8}" y="{tby+18}">DCS — Distributed Control System (bench)</text>
-  <text class="tb" x="{tbx+8}" y="{tby+46}">Loop · 250R shunt · ADS1115 · LLC · Pi 4</text>
+  <text class="tb" x="{tbx+8}" y="{tby+46}">PS1 · F1 · loop · 250R · ADS1115 · LLC · Pi 4</text>
   <text class="tbb" x="{tbx+8}" y="{tby+76}">SCH-DCS-003</text>
-  <text class="tbb" x="{tbx+178}" y="{tby+76}">REV F</text>
+  <text class="tbb" x="{tbx+178}" y="{tby+76}">REV G</text>
   <text class="tb" x="{tbx+268}" y="{tby+76}">1 / 1</text>
   <text class="tb" x="{tbx+8}" y="{tby+108}">2026-09-28</text>
   <text class="tb" x="{tbx+178}" y="{tby+108}">NTS</text>

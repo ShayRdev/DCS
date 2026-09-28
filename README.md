@@ -134,7 +134,7 @@ DCS/
 | ADS1115 breakout | [Adafruit 1085](https://www.adafruit.com/product/1085) or equiv. | 16-bit ADC @ **5 V**, addr `0x48` |
 | **250 Ω** ±0.1% shunt | — | 4–20 mA → 1–5 V |
 | Mean Well DIN-rail 24 VDC PSU | [HDR-15-24 example](https://www.amazon.com/dp/B0C9C4LNR4) | Loop supply |
-| DIN terminal blocks / fuse TBs | [PT 4-HESI example](https://www.amazon.com/dp/B0D59WVSKS) | Loop landing / protection |
+| DIN fuse TB (PT 4-HESI, 5×20) | [B0D59WVSKS](https://www.amazon.com/dp/B0D59WVSKS) | **F1** in series on `+24V` before Rosemount (amp rating TBD) |
 | Brass ground bar on DIN | — | Star ground |
 | Rosemount temperature transmitter | 2-wire 4–20 mA | Process input |
 | Fluke 789 ProcessMeter | Test gear | mA OUTPUT checkout (e.g. 8.000 mA / 25%) |
@@ -167,7 +167,7 @@ Full netlist / pin tables for SKiDL or KiCad (Markdown):
 
 Clean left→right block drawing (portfolio / review). Open the SVG or PDF — do **not** use the auto-placed SKiDL `.kicad_sch` for display:
 
-- **[docs/hardware/schematic-blocks.svg](docs/hardware/schematic-blocks.svg)** — **SCH-DCS-003** rev **F** (primary, IEEE/IEC symbols)
+- **[docs/hardware/schematic-blocks.svg](docs/hardware/schematic-blocks.svg)** — **SCH-DCS-003** rev **G** (primary, IEEE/IEC symbols; includes **F1** PT 4-HESI)
 - **[docs/hardware/schematic-blocks.pdf](docs/hardware/schematic-blocks.pdf)** — same drawing as PDF
 - Older overview/pinout sheets (rev C): [schematic-overview.pdf](docs/hardware/schematic-overview.pdf) · [pinout.pdf](docs/hardware/pinout.pdf)
 - [docs/hardware/hardware-notes.md](docs/hardware/hardware-notes.md)
