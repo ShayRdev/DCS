@@ -162,6 +162,7 @@ ADS1115 **VDD = 5 V** (not Pi 3V3). **ADDR → GND** ⇒ **0x48**.
 Full netlist / pin tables for SKiDL or KiCad (Markdown):
 
 - **[docs/hardware/CONNECTIONS.md](docs/hardware/CONNECTIONS.md)** — every confirmed connection, rails, 250 Ω shunt, LLC, ADS1115, TODOs for gaps
+- **[hardware/skidl/](hardware/skidl/)** — SKiDL Python project → `out/dcs.net`, `out/bom.csv`, checklist (`python3 main.py`)
 
 ### Schematics (PDF)
 

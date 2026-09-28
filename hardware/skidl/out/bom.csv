@@ -1,0 +1,13 @@
+reference,value,footprint,part_number,symbol
+D1,1N4148,Diode_THT:D_DO-35_SOD27_P7.62mm_Horizontal,"OPTIONAL clamp AIN0 to +5V_ADS (A=AIN, K=+5V)",D
+D2,1N4148,Diode_THT:D_DO-35_SOD27_P7.62mm_Horizontal,"OPTIONAL clamp AIN0 to GND (K=AIN, A=GND)",D
+J1,Rosemount_2wire_TT,Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical,,Conn_01x02
+J2,DIN_TB_+24V_LOOP,Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical,,Conn_01x02
+J3,AC_LN_landing,Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical,,Conn_01x02
+J4,PE_brass_ground_bar,Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical,,Conn_01x02
+PS1,MeanWell_DIN_24V_HDR-15-24_family,Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical,,Conn_01x04
+R1,250,Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal,Shunt 250R — 4-20mA to 1-5V (CONNECTIONS.md RS250),R
+R2,1k,Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal,OPTIONAL AIN0 series — alarm 23mA*250R=5.75V clamp path,R
+U1,RaspberryPi4_Model_B_GPIO_subset,Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical,,Conn_01x06
+U2,ADS1115,Package_SO:TSSOP-10_3x3mm_P0.5mm,,ADS1115
+U3,4_BiDirectional_Level_Shifters,Connector_PinHeader_2.54mm:PinHeader_1x12_P2.54mm_Vertical,,Conn_01x12

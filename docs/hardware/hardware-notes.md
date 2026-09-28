@@ -6,6 +6,8 @@ Open the **PDF** drawings in this folder (GitHub does not render PDF as inline M
 
 **Wire-level netlist for SKiDL / KiCad (preferred):** [`CONNECTIONS.md`](CONNECTIONS.md)
 
+**SKiDL project (generates KiCad `.net` + BOM):** [`../../hardware/skidl/`](../../hardware/skidl/) — run `python3 main.py`; see `out/`.
+
 ## What this measured on the bench
 
 A **Rosemount** 2-wire **temperature transmitter** (4–20 mA) was wired through a **250 Ω** shunt into an **ADS1115** (5 V) on a Raspberry Pi 4. I²C crossed a blue **4 Bi-Directional Level Shifters** module on a green perfboard HAT. The Pi printed `V` / `I` / `%Span` in the terminal and streamed readings to the Electron desktop app over WebSocket. Loop points were checked with a **Fluke 789** (e.g. 8.000 mA / 25.0% OUTPUT).

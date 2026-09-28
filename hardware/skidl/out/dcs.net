@@ -1,0 +1,671 @@
+(export 
+  (version "D")
+  (design
+    (source "main.py")
+    (date "09/28/2026 12:43 AM")
+    (tool "SKiDL (2.3.0)")
+    (sheet
+      (number 1)
+      (name "/")
+      (tstamps "/")
+      (title_block
+        (title)
+        (company)
+        (rev)
+        (date)
+        (source "main.py")
+        (comment
+          (number "1")
+          (value ""))
+        (comment
+          (number "2")
+          (value ""))
+        (comment
+          (number "3")
+          (value ""))
+        (comment
+          (number "4")
+          (value ""))
+        (comment
+          (number "5")
+          (value ""))
+        (comment
+          (number "6")
+          (value ""))
+        (comment
+          (number "7")
+          (value ""))
+        (comment
+          (number "8")
+          (value ""))
+        (comment
+          (number "9")
+          (value "")))))
+  (components
+    (comp
+      (ref "#FLG1")
+      (value "PWR_FLAG")
+      (description "")
+      (footprint "power:PWR_FLAG")
+      (fields
+        (field
+          (name "Description"))
+        (field
+          (name "Footprint") "power:PWR_FLAG")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "6ZcxRCY3m8")
+        (field
+          (name "SKiDL Line") "power.py:73"))
+      (libsource
+        (lib "NO_LIB")
+        (part "PWR_FLAG"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (tstamps "17ca84a2-cade-5b73-aa0a-481f296bf980"))
+    (comp
+      (ref "#FLG2")
+      (value "PWR_FLAG")
+      (description "")
+      (footprint "power:PWR_FLAG")
+      (fields
+        (field
+          (name "Description"))
+        (field
+          (name "Footprint") "power:PWR_FLAG")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "Z8SWpr4Uz8")
+        (field
+          (name "SKiDL Line") "power.py:73"))
+      (libsource
+        (lib "NO_LIB")
+        (part "PWR_FLAG"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (tstamps "0031ab35-185a-592f-b7a0-2f9a31b0b7aa"))
+    (comp
+      (ref "#FLG3")
+      (value "PWR_FLAG")
+      (description "")
+      (footprint "power:PWR_FLAG")
+      (fields
+        (field
+          (name "Description"))
+        (field
+          (name "Footprint") "power:PWR_FLAG")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "oScX0oZNfq")
+        (field
+          (name "SKiDL Line") "power.py:73"))
+      (libsource
+        (lib "NO_LIB")
+        (part "PWR_FLAG"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (tstamps "4907cdeb-be13-59bf-b310-3074e503aa0a"))
+    (comp
+      (ref "#FLG4")
+      (value "PWR_FLAG")
+      (description "")
+      (footprint "power:PWR_FLAG")
+      (fields
+        (field
+          (name "Description"))
+        (field
+          (name "Footprint") "power:PWR_FLAG")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "i1SG4mbVtA")
+        (field
+          (name "SKiDL Line") "power.py:73"))
+      (libsource
+        (lib "NO_LIB")
+        (part "PWR_FLAG"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (tstamps "a847280b-fa8c-5abb-816f-240093aace2c"))
+    (comp
+      (ref "D1")
+      (value "1N4148")
+      (description "")
+      (footprint "Diode_THT:D_DO-35_SOD27_P7.62mm_Horizontal")
+      (fields
+        (field
+          (name "Description") "OPTIONAL clamp AIN0 to +5V_ADS (A=AIN, K=+5V)")
+        (field
+          (name "Optional") "yes")
+        (field
+          (name "Description"))
+        (field
+          (name "Footprint") "Diode_THT:D_DO-35_SOD27_P7.62mm_Horizontal")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "wydsjMo046")
+        (field
+          (name "SKiDL Line") "adc.py:54"))
+      (libsource
+        (lib "NO_LIB")
+        (part "D"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (tstamps "9ce16559-f136-50d1-b805-ed99e37f27fc"))
+    (comp
+      (ref "D2")
+      (value "1N4148")
+      (description "")
+      (footprint "Diode_THT:D_DO-35_SOD27_P7.62mm_Horizontal")
+      (fields
+        (field
+          (name "Description") "OPTIONAL clamp AIN0 to GND (K=AIN, A=GND)")
+        (field
+          (name "Optional") "yes")
+        (field
+          (name "Description"))
+        (field
+          (name "Footprint") "Diode_THT:D_DO-35_SOD27_P7.62mm_Horizontal")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "Lv_Pg9szf2")
+        (field
+          (name "SKiDL Line") "adc.py:59"))
+      (libsource
+        (lib "NO_LIB")
+        (part "D"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (tstamps "d7cea58a-2053-54cb-884a-12aca3a0210d"))
+    (comp
+      (ref "J1")
+      (value "Rosemount_2wire_TT")
+      (description "")
+      (footprint "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical")
+      (fields
+        (field
+          (name "Description"))
+        (field
+          (name "Footprint") "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "U5XhZA5WEt")
+        (field
+          (name "SKiDL Line") "loop.py:25"))
+      (libsource
+        (lib "NO_LIB")
+        (part "Conn_01x02"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (tstamps "7f91676b-c1ad-5632-b3af-dc6adf3d6e62"))
+    (comp
+      (ref "J2")
+      (value "DIN_TB_+24V_LOOP")
+      (description "")
+      (footprint "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical")
+      (fields
+        (field
+          (name "Description"))
+        (field
+          (name "Footprint") "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "Yxkv5g3Phf")
+        (field
+          (name "SKiDL Line") "power.py:65"))
+      (libsource
+        (lib "NO_LIB")
+        (part "Conn_01x02"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (tstamps "823e0cad-e574-56f2-b504-f5ec8d328805"))
+    (comp
+      (ref "J3")
+      (value "AC_LN_landing")
+      (description "")
+      (footprint "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical")
+      (fields
+        (field
+          (name "Description"))
+        (field
+          (name "Footprint") "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "FvoMP2sMbN")
+        (field
+          (name "SKiDL Line") "power.py:38"))
+      (libsource
+        (lib "NO_LIB")
+        (part "Conn_01x02"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (tstamps "d63184fa-2f11-5713-bcd0-c9d55db10e82"))
+    (comp
+      (ref "J4")
+      (value "PE_brass_ground_bar")
+      (description "")
+      (footprint "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical")
+      (fields
+        (field
+          (name "Note") "Pin1=PE land, Pin2=signal GND land; both star to GND")
+        (field
+          (name "Description"))
+        (field
+          (name "Footprint") "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "_1vk01UwT_")
+        (field
+          (name "SKiDL Line") "power.py:57"))
+      (libsource
+        (lib "NO_LIB")
+        (part "Conn_01x02"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (tstamps "17f6f03d-1957-54b8-b724-45fca3db70d6"))
+    (comp
+      (ref "PS1")
+      (value "MeanWell_DIN_24V_HDR-15-24_family")
+      (description "")
+      (footprint "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical")
+      (fields
+        (field
+          (name "Description"))
+        (field
+          (name "Footprint") "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "TQvPFhfzLE")
+        (field
+          (name "SKiDL Line") "power.py:47"))
+      (libsource
+        (lib "NO_LIB")
+        (part "Conn_01x04"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (tstamps "55c02e96-449c-5acf-9fef-d00903bba773"))
+    (comp
+      (ref "R1")
+      (value "250")
+      (description "")
+      (footprint "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal")
+      (fields
+        (field
+          (name "Tolerance") "0.1%")
+        (field
+          (name "Description") "Shunt 250R — 4-20mA to 1-5V (CONNECTIONS.md RS250)")
+        (field
+          (name "Description"))
+        (field
+          (name "Footprint") "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "PmBrQImTk5")
+        (field
+          (name "SKiDL Line") "loop.py:29"))
+      (libsource
+        (lib "NO_LIB")
+        (part "R"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (tstamps "577273ff-56a4-567a-b443-8ead26d5bec5"))
+    (comp
+      (ref "R2")
+      (value "1k")
+      (description "")
+      (footprint "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal")
+      (fields
+        (field
+          (name "Description") "OPTIONAL AIN0 series — alarm 23mA*250R=5.75V clamp path")
+        (field
+          (name "Optional") "yes")
+        (field
+          (name "Description"))
+        (field
+          (name "Footprint") "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "IJCaRH8mpj")
+        (field
+          (name "SKiDL Line") "adc.py:49"))
+      (libsource
+        (lib "NO_LIB")
+        (part "R"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (tstamps "6284ba16-5780-57f9-872a-512271fcf6ba"))
+    (comp
+      (ref "U1")
+      (value "RaspberryPi4_Model_B_GPIO_subset")
+      (description "")
+      (footprint "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical")
+      (fields
+        (field
+          (name "ConnPin1") "HDR1_3V3")
+        (field
+          (name "ConnPin2") "HDR2or4_5V")
+        (field
+          (name "ConnPin3") "HDR3_GPIO2_SDA")
+        (field
+          (name "ConnPin4") "HDR5_GPIO3_SCL")
+        (field
+          (name "ConnPin5") "HDR6_GND")
+        (field
+          (name "ConnPin6") "HDR11_GPIO17_optional")
+        (field
+          (name "Description"))
+        (field
+          (name "Footprint") "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "lPdbU6GDzF")
+        (field
+          (name "SKiDL Line") "mcu.py:24"))
+      (libsource
+        (lib "NO_LIB")
+        (part "Conn_01x06"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (tstamps "e906def7-486f-549b-adf4-77cda9860197"))
+    (comp
+      (ref "U2")
+      (value "ADS1115")
+      (description "")
+      (footprint "Package_SO:TSSOP-10_3x3mm_P0.5mm")
+      (fields
+        (field
+          (name "I2C_addr") "0x48")
+        (field
+          (name "PGA") "+/-6.144V")
+        (field
+          (name "Note") "Breakout on bench; symbol=TSSOP-10 stock mirror")
+        (field
+          (name "Description"))
+        (field
+          (name "Footprint") "Package_SO:TSSOP-10_3x3mm_P0.5mm")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "rAl3tIU1m3")
+        (field
+          (name "SKiDL Line") "adc.py:27"))
+      (libsource
+        (lib "NO_LIB")
+        (part "ADS1115"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (tstamps "0d2bbc56-5b45-5fb6-9745-fa0a4026dfb8"))
+    (comp
+      (ref "U3")
+      (value "4_BiDirectional_Level_Shifters")
+      (description "")
+      (footprint "Connector_PinHeader_2.54mm:PinHeader_1x12_P2.54mm_Vertical")
+      (fields
+        (field
+          (name "Silk") "LV A1 A2 A3 A4 GND | HV B1 B2 B3 B4 GND")
+        (field
+          (name "Description"))
+        (field
+          (name "Footprint") "Connector_PinHeader_2.54mm:PinHeader_1x12_P2.54mm_Vertical")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "YkHKkLX0pS")
+        (field
+          (name "SKiDL Line") "level_shifter.py:19"))
+      (libsource
+        (lib "NO_LIB")
+        (part "Conn_01x12"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (tstamps "11931ce4-bde3-5fd9-89c7-8f581d0355bb")))
+  (nets
+    (net
+      (code 1)
+      (name "+24V_LOOP")
+      (class "Default")
+      (node
+        (ref "#FLG2")
+        (pin "1")
+        (pintype "POWER-IN"))
+      (node
+        (ref "J1")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "J2")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "PS1")
+        (pin "3")
+        (pintype "PASSIVE")))
+    (net
+      (code 2)
+      (name "+3V3_PI")
+      (class "Default")
+      (node
+        (ref "#FLG4")
+        (pin "1")
+        (pintype "POWER-IN"))
+      (node
+        (ref "U1")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "U3")
+        (pin "1")
+        (pintype "PASSIVE")))
+    (net
+      (code 3)
+      (name "+5V_ADS")
+      (class "Default")
+      (node
+        (ref "#FLG3")
+        (pin "1")
+        (pintype "POWER-IN"))
+      (node
+        (ref "D1")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "U1")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
+        (ref "U2")
+        (pin "8")
+        (pintype "POWER-IN"))
+      (node
+        (ref "U3")
+        (pin "7")
+        (pintype "PASSIVE")))
+    (net
+      (code 4)
+      (name "AC_L")
+      (class "Default")
+      (node
+        (ref "J3")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "PS1")
+        (pin "1")
+        (pintype "PASSIVE")))
+    (net
+      (code 5)
+      (name "AC_N")
+      (class "Default")
+      (node
+        (ref "J3")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
+        (ref "PS1")
+        (pin "2")
+        (pintype "PASSIVE")))
+    (net
+      (code 6)
+      (name "AIN0_PROT")
+      (class "Default")
+      (node
+        (ref "D1")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
+        (ref "D2")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "R2")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
+        (ref "U2")
+        (pin "4")
+        (pintype "INPUT")))
+    (net
+      (code 7)
+      (name "GND")
+      (class "Default")
+      (node
+        (ref "#FLG1")
+        (pin "1")
+        (pintype "POWER-IN"))
+      (node
+        (ref "D2")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
+        (ref "J2")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
+        (ref "J4")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "J4")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
+        (ref "PS1")
+        (pin "4")
+        (pintype "PASSIVE"))
+      (node
+        (ref "R1")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
+        (ref "U1")
+        (pin "5")
+        (pintype "PASSIVE"))
+      (node
+        (ref "U2")
+        (pin "1")
+        (pintype "INPUT"))
+      (node
+        (ref "U2")
+        (pin "3")
+        (pintype "POWER-IN"))
+      (node
+        (ref "U3")
+        (pin "12")
+        (pintype "PASSIVE"))
+      (node
+        (ref "U3")
+        (pin "6")
+        (pintype "PASSIVE")))
+    (net
+      (code 8)
+      (name "I2C_SCL_3V3")
+      (class "Default")
+      (node
+        (ref "U1")
+        (pin "4")
+        (pintype "PASSIVE"))
+      (node
+        (ref "U3")
+        (pin "3")
+        (pintype "PASSIVE")))
+    (net
+      (code 9)
+      (name "I2C_SCL_5V")
+      (class "Default")
+      (node
+        (ref "U2")
+        (pin "10")
+        (pintype "INPUT"))
+      (node
+        (ref "U3")
+        (pin "9")
+        (pintype "PASSIVE")))
+    (net
+      (code 10)
+      (name "I2C_SDA_3V3")
+      (class "Default")
+      (node
+        (ref "U1")
+        (pin "3")
+        (pintype "PASSIVE"))
+      (node
+        (ref "U3")
+        (pin "2")
+        (pintype "PASSIVE")))
+    (net
+      (code 11)
+      (name "I2C_SDA_5V")
+      (class "Default")
+      (node
+        (ref "U2")
+        (pin "9")
+        (pintype "BIDIRECTIONAL"))
+      (node
+        (ref "U3")
+        (pin "8")
+        (pintype "PASSIVE")))
+    (net
+      (code 12)
+      (name "NET_SHUNT_HIGH")
+      (class "Default")
+      (node
+        (ref "J1")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
+        (ref "R1")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "R2")
+        (pin "1")
+        (pintype "PASSIVE")))))
