@@ -1,0 +1,12 @@
+Symbol dir: /tmp/kicad-symbols
+--- ERC ---
+ERC INFO: No errors or warnings found while running ERC.
+(Empty stdout capture; SKiDL 2.x may log via logging module.)
+
+--- generate_schematic ---
+[auto_stub] power: +3V3_PI(3), GND(12), +5V_ADS(5), +24V_LOOP(4) @ [/workspace/hardware/skidl/schematic.py:326=>/workspace/hardware/skidl/schematic.py:255]
+  [auto_stub] deferred fanout>=5: __NOCONNECT(43) @ [/workspace/hardware/skidl/schematic.py:326=>/workspace/hardware/skidl/schematic.py:255]
+  [selective_routing] Stubbed 1 complex/distant nets after placement @ [/workspace/hardware/skidl/schematic.py:326=>/workspace/hardware/skidl/schematic.py:255]
+Schematic written to /workspace/hardware/skidl/out/dcs.kicad_sch @ [/workspace/hardware/skidl/schematic.py:326=>/workspace/hardware/skidl/schematic.py:255]
+5 warnings found while generating schematic.
+0 errors found while generating schematic.
