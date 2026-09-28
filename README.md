@@ -157,6 +157,12 @@ ADS1115 **VDD = 5 V** (not Pi 3V3). **ADDR → GND** ⇒ **0x48**.
 
 **Loop:** `+24 V` (Mean Well) → Rosemount `+` → Rosemount `−` → **shunt high (250 Ω)** → ADS1115 **AIN0**; **shunt low** → `24 V−` and ADC/Pi GND (star at the brass bar).
 
+### Connections (wire-level, preferred for schematics)
+
+Full netlist / pin tables for SKiDL or KiCad (Markdown):
+
+- **[docs/hardware/CONNECTIONS.md](docs/hardware/CONNECTIONS.md)** — every confirmed connection, rails, 250 Ω shunt, LLC, ADS1115, TODOs for gaps
+
 ### Schematics (PDF)
 
 GitHub does **not** inline PDF drawings in Markdown — **open the PDF files**:
