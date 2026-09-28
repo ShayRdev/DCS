@@ -1,7 +1,7 @@
 """
 U3 — Blue 4 Bi-Directional Level Shifters module.
 
-STAND-IN: Connector_Generic Conn_01x12 matching module silk order
+Symbol: Connector_Generic Conn_01x12 matching module silk order
 (CONNECTIONS.md photo): LV, A1, A2, A3, A4, GND | HV, B1, B2, B3, B4, GND
 
 Used: LV, HV, GND×2, A1/A2, B1/B2.
@@ -12,14 +12,18 @@ from __future__ import annotations
 
 from skidl import Net
 
-from parts import Conn_01x12, nc_net
+from parts import Conn_01x12 as _Conn_01x12
+from parts import nc_net
 
 
-def build_level_shifter(v33, v5, gnd, i2c_sda_3v3, i2c_scl_3v3):
+def build_level_shifter(v33, v5, gnd, i2c_sda_3v3, i2c_scl_3v3, *, Conn_01x12=None):
+    Conn_01x12 = Conn_01x12 or _Conn_01x12
+
     u3 = Conn_01x12()
     u3.ref = "U3"
     u3.value = "4_BiDirectional_Level_Shifters"
     u3.fields["Silk"] = "LV A1 A2 A3 A4 GND | HV B1 B2 B3 B4 GND"
+    u3.fields["Symbol"] = "Connector_Generic:Conn_01x12"
 
     i2c_sda_5v = Net("I2C_SDA_5V")
     i2c_scl_5v = Net("I2C_SCL_5V")

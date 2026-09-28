@@ -7,12 +7,14 @@ AC terminal silk on PS1 is TODO/unverified — pins are generic 1..4 only.
 
 from __future__ import annotations
 
-from skidl import Net, POWER
+from skidl import POWER, Net
 
-from parts import Conn_01x02, Conn_01x04, PWR_FLAG
+from parts import Conn_01x02 as _Conn_01x02
+from parts import Conn_01x04 as _Conn_01x04
+from parts import PWR_FLAG as _PWR_FLAG
 
 
-def build_power():
+def build_power(*, Conn_01x02=None, Conn_01x04=None, PWR_FLAG=None):
     """
     Returns dict of nets and PS1 / AC / PE connectors.
 
@@ -22,6 +24,10 @@ def build_power():
       3 = +V  → +24V_LOOP
       4 = −V  → GND  (was 0V_LOOP; merged)
     """
+    Conn_01x02 = Conn_01x02 or _Conn_01x02
+    Conn_01x04 = Conn_01x04 or _Conn_01x04
+    PWR_FLAG = PWR_FLAG or _PWR_FLAG
+
     gnd = Net("GND")
     gnd.drive = POWER
 
@@ -43,7 +49,7 @@ def build_power():
     j_ac[1] += ac_l
     j_ac[2] += ac_n
 
-    # PS1 — Mean Well family stand-in (Connector_Generic)
+    # PS1 — Mean Well family (Connector_Generic Conn_01x04 stand-in)
     ps1 = Conn_01x04()
     ps1.ref = "PS1"
     ps1.value = "MeanWell_DIN_24V_HDR-15-24_family"

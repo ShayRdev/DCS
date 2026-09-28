@@ -1,7 +1,7 @@
 """
 U2 — ADS1115 (+ optional AIN0 input protection).
 
-Chip pinout mirrors KiCad Analog_ADC:ADS1115IDGS (TSSOP-10).
+Chip pinout: KiCad Analog_ADC:ADS1115IDGS (TSSOP-10).
 Bench uses a breakout exposing the same net names (CONNECTIONS.md).
 
 Unused AIN1–AIN3: NC (CONNECTIONS TODO — do not invent GND ties).
@@ -13,10 +13,24 @@ from __future__ import annotations
 
 from skidl import Net
 
-from parts import ADS1115, D, R, nc_net
+from parts import ADS1115 as _ADS1115
+from parts import D as _D
+from parts import R as _R
+from parts import nc_net
 
 
-def build_adc(v5, gnd, i2c_sda_5v, i2c_scl_5v, net_shunt_high, *, include_ain0_protection=True):
+def build_adc(
+    v5,
+    gnd,
+    i2c_sda_5v,
+    i2c_scl_5v,
+    net_shunt_high,
+    *,
+    include_ain0_protection=True,
+    ADS1115=None,
+    R=None,
+    D=None,
+):
     """
     OPTIONAL AIN0 protection (R2 + D1 + D2):
       Rosemount alarm current can reach ~23 mA → 23e-3 * 250 = 5.75 V across
@@ -24,12 +38,17 @@ def build_adc(v5, gnd, i2c_sda_5v, i2c_scl_5v, net_shunt_high, *, include_ain0_p
       (typically VDD+0.3V). Series resistor + clamp diodes to +5V_ADS / GND
       limit AIN0. Marked OPTIONAL — not in the permanent CONNECTIONS.md BOM.
     """
+    ADS1115 = ADS1115 or _ADS1115
+    R = R or _R
+    D = D or _D
+
     u2 = ADS1115()
     u2.ref = "U2"
     u2.value = "ADS1115"
     u2.fields["I2C_addr"] = "0x48"
     u2.fields["PGA"] = "+/-6.144V"
-    u2.fields["Note"] = "Breakout on bench; symbol=TSSOP-10 stock mirror"
+    u2.fields["Symbol"] = "Analog_ADC:ADS1115IDGS"
+    u2.fields["Note"] = "Breakout on bench; symbol=TSSOP-10 stock; swap footprint"
 
     u2["VDD"] += v5
     u2["GND"] += gnd

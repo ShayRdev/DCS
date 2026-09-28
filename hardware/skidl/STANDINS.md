@@ -7,14 +7,14 @@ This SKiDL project runs without a local `KICAD*_SYMBOL_DIR` by defining parts in
 | R1, R2 | Resistors | No (mirrors Device:R) | `Device:R` |
 | D1, D2 | Diodes | No (mirrors Device:D) | `Device:D` |
 | U2 | ADS1115 | Pinout mirrors stock IC | `Analog_ADC:ADS1115IDGS` (TSSOP-10); bench is a **breakout** — change footprint |
-| U1 | Raspberry Pi 4 GPIO subset | **YES** — `Conn_01x06` | MCU/Raspberry Pi symbol or keep Conn with pin notes |
+| U1 | Raspberry Pi 4 | **YES** in `main.py` (`Conn_01x06`); **stock** in `schematic.py` (`Conn_02x20_Odd_Even`) | Prefer `schematic.py` output for KiCad |
 | U3 | 4 Bi-Directional Level Shifters | **YES** — `Conn_01x12` | Custom module symbol; silk order LV/A1–A4/GND/HV/B1–B4/GND |
 | PS1 | Mean Well DIN 24 V | **YES** — `Conn_01x04` | PSU symbol; silk L/N/+V/−V is TODO in CONNECTIONS |
 | J1 | Rosemount TT | **YES** — `Conn_01x02` | Terminal block / connector |
 | J2–J4 | DIN/AC/PE lands | **YES** — `Conn_01x02` | Terminal blocks |
 | #FLGn | PWR_FLAG | Mirrors `power:PWR_FLAG` | `power:PWR_FLAG` |
 
-## U1 pin map (stand-in)
+## U1 pin map — `main.py` stand-in (`Conn_01x06`)
 
 | U1 pin | Net | Pi header |
 |--------|-----|-----------|
@@ -24,6 +24,10 @@ This SKiDL project runs without a local `KICAD*_SYMBOL_DIR` by defining parts in
 | 4 | I2C_SCL_3V3 | pin 5 GPIO3 |
 | 5 | GND | pin 6 |
 | 6 | NC | pin 11 GPIO17 optional |
+
+## U1 pin map — `schematic.py` stock (`Conn_02x20_Odd_Even`)
+
+Same nets; pin numbers are the physical 40-pin header: 1→3V3, 2→5V, 3→SDA, 5→SCL, 6→GND, 11→GPIO17 NC; all other header pins NC.
 
 ## U3 pin map (stand-in)
 

@@ -10,18 +10,22 @@ from __future__ import annotations
 
 from skidl import Net
 
-from parts import Conn_01x02, R
+from parts import Conn_01x02 as _Conn_01x02
+from parts import R as _R
 
 
-def build_loop(v24, gnd):
+def build_loop(v24, gnd, *, Conn_01x02=None, R=None):
     """
-    J1 = Rosemount 2-wire terminals (stand-in Conn_01x02).
+    J1 = Rosemount 2-wire terminals (Conn_01x02).
       1 = +
       2 = −
     R1 = 250 Ω ±0.1% shunt
       1 = high (NET_SHUNT_HIGH)
       2 = low  (GND)
     """
+    Conn_01x02 = Conn_01x02 or _Conn_01x02
+    R = R or _R
+
     j1 = Conn_01x02()
     j1.ref = "J1"
     j1.value = "Rosemount_2wire_TT"
