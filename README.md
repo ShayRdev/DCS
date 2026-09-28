@@ -114,7 +114,7 @@ DCS/
 ├── raspberry-pi/         # ADS1115 reader + WebSocket service
 ├── simulator/            # LAN-free stand-in for the Pi service
 ├── docs/
-│   ├── hardware/         # PDF schematics + notes
+│   ├── hardware/         # Block schematic SVG/PDF + CONNECTIONS.md + notes
 │   └── images/           # App screenshots, bench photos, composite
 └── README.md
 ```
@@ -157,20 +157,24 @@ ADS1115 **VDD = 5 V** (not Pi 3V3). **ADDR → GND** ⇒ **0x48**.
 
 **Loop:** `+24 V` (Mean Well) → Rosemount `+` → Rosemount `−` → **shunt high (250 Ω)** → ADS1115 **AIN0**; **shunt low** → `24 V−` and ADC/Pi GND (star at the brass bar).
 
-### Connections (wire-level, preferred for schematics)
+### Connections (wire-level truth)
 
 Full netlist / pin tables for SKiDL or KiCad (Markdown):
 
-- **[docs/hardware/CONNECTIONS.md](docs/hardware/CONNECTIONS.md)** — every confirmed connection, rails, 250 Ω shunt, LLC, ADS1115, TODOs for gaps
-- **[hardware/skidl/](hardware/skidl/)** — SKiDL Python project → `out/dcs.net`, `out/bom.csv`, checklist (`python3 main.py`)
+- **[docs/hardware/CONNECTIONS.md](docs/hardware/CONNECTIONS.md)** — every confirmed connection, rails, 250 Ω shunt, LLC, ADS1115, TODOs for gaps. **Sole electrical source of truth.**
 
-### Schematics (PDF)
+### Schematics (human-readable)
 
-GitHub does **not** inline PDF drawings in Markdown — **open the PDF files**:
+Clean left→right block drawing (portfolio / review). Open the SVG or PDF — do **not** use the auto-placed SKiDL `.kicad_sch` for display:
 
-- [docs/hardware/schematic-overview.pdf](docs/hardware/schematic-overview.pdf) — **SCH-DCS-001** rev C
-- [docs/hardware/pinout.pdf](docs/hardware/pinout.pdf) — **SCH-DCS-002** rev C
+- **[docs/hardware/schematic-blocks.svg](docs/hardware/schematic-blocks.svg)** — **SCH-DCS-003** rev **E** (primary)
+- **[docs/hardware/schematic-blocks.pdf](docs/hardware/schematic-blocks.pdf)** — same drawing as PDF
+- Older overview/pinout sheets (rev C): [schematic-overview.pdf](docs/hardware/schematic-overview.pdf) · [pinout.pdf](docs/hardware/pinout.pdf)
 - [docs/hardware/hardware-notes.md](docs/hardware/hardware-notes.md)
+
+### SKiDL / KiCad (machine netlist)
+
+- **[hardware/skidl/](hardware/skidl/)** — `python3 main.py` → `out/dcs.net` + BOM; `python3 schematic.py` → `out/dcs.kicad_sch` (auto-layout only — **not** the portfolio drawing above)
 
 ### Check the ADC
 

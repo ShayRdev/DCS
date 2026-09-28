@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="920" viewBox="0 0 1600 920" role="img" aria-label="DCS electrical schematic SCH-DCS-003 rev E">
+  <title>DCS - Block Schematic SCH-DCS-003 Rev E</title>
+  <desc>Left-to-right: Mean Well 24V PSU to Rosemount TT to 250 ohm shunt to ADS1115 to level shifter to Raspberry Pi 4. Source: CONNECTIONS.md rev D. No TODO pin inventions.</desc>
+
+  <defs>
+    <style type="text/css"><![CDATA[
+      .bg { fill: #eef1f4; }
+      .sheet { fill: #f8fafb; stroke: #1c2833; stroke-width: 2; }
+      .block { fill: #ffffff; stroke: #1c2833; stroke-width: 1.75; }
+      .block-hdr { fill: #d5dde6; stroke: #1c2833; stroke-width: 1.25; }
+      .wire { fill: none; stroke: #1c2833; stroke-width: 1.6; stroke-linecap: square; stroke-linejoin: miter; }
+      .wire-gnd { fill: none; stroke: #1c2833; stroke-width: 1.6; }
+      .dot { fill: #1c2833; }
+      .pin { fill: none; stroke: #1c2833; stroke-width: 1.25; }
+      .t-title { font-family: "IBM Plex Sans", "Segoe UI", Helvetica, Arial, sans-serif; font-size: 22px; font-weight: 700; fill: #0f1720; }
+      .t-sub { font-family: "IBM Plex Sans", "Segoe UI", Helvetica, Arial, sans-serif; font-size: 13px; fill: #334155; }
+      .t-block { font-family: "IBM Plex Sans", "Segoe UI", Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 700; fill: #0f1720; }
+      .t-ref { font-family: "IBM Plex Mono", "Consolas", "Courier New", monospace; font-size: 12px; font-weight: 700; fill: #0b3d5c; }
+      .t-pin { font-family: "IBM Plex Mono", "Consolas", "Courier New", monospace; font-size: 10.5px; fill: #1c2833; }
+      .t-net { font-family: "IBM Plex Mono", "Consolas", "Courier New", monospace; font-size: 10.5px; font-weight: 600; fill: #0b3d5c; }
+      .t-note { font-family: "IBM Plex Sans", "Segoe UI", Helvetica, Arial, sans-serif; font-size: 10.5px; fill: #475569; }
+      .t-tb { font-family: "IBM Plex Sans", "Segoe UI", Helvetica, Arial, sans-serif; font-size: 11px; fill: #1c2833; }
+      .t-tb-b { font-family: "IBM Plex Sans", "Segoe UI", Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 700; fill: #0f1720; }
+    ]]></style>
+  </defs>
+
+  <rect class="bg" width="1600" height="920"/>
+  <rect class="sheet" x="24" y="24" width="1552" height="872"/>
+
+  <text class="t-title" x="48" y="58">DCS - Process Loop &amp; ADC Interface</text>
+  <text class="t-sub" x="48" y="78">Block schematic · electrical only · source: docs/hardware/CONNECTIONS.md (rev D)</text>
+  <text class="t-note" x="48" y="96">Flow left to right: PS1 24 V → Rosemount → R1 250 Ω → U2 ADS1115 → U3 LLC → U1 Pi 4 · 0V_LOOP bonded to GND at star · unused pins omitted (not invented)</text>
+
+  <!-- PS1 -->
+  <g id="PS1">
+    <rect class="block" x="56" y="160" width="170" height="220" rx="2"/>
+    <rect class="block-hdr" x="56" y="160" width="170" height="36" rx="2"/>
+    <text class="t-ref" x="68" y="183">PS1</text>
+    <text class="t-block" x="108" y="183">Mean Well 24 V</text>
+    <text class="t-note" x="68" y="214">DIN-rail PSU</text>
+    <text class="t-note" x="68" y="230">HDR-15-24 family</text>
+    <line class="pin" x1="226" y1="270" x2="236" y2="270"/>
+    <text class="t-pin" x="148" y="274">+V</text>
+    <line class="pin" x1="226" y1="330" x2="236" y2="330"/>
+    <text class="t-pin" x="148" y="334">-V</text>
+    <text class="t-note" x="68" y="340">AC L / N in</text>
+    <text class="t-note" x="68" y="356">(labels TBD)</text>
+  </g>
+
+  <!-- J1 -->
+  <g id="J1">
+    <rect class="block" x="310" y="160" width="160" height="220" rx="2"/>
+    <rect class="block-hdr" x="310" y="160" width="160" height="36" rx="2"/>
+    <text class="t-ref" x="322" y="183">J1</text>
+    <text class="t-block" x="350" y="183">Rosemount TT</text>
+    <text class="t-note" x="322" y="214">2-wire 4-20 mA</text>
+    <text class="t-note" x="322" y="230">loop-powered</text>
+    <line class="pin" x1="300" y1="270" x2="310" y2="270"/>
+    <text class="t-pin" x="322" y="274">+</text>
+    <line class="pin" x1="470" y1="300" x2="480" y2="300"/>
+    <text class="t-pin" x="430" y="304">-</text>
+  </g>
+
+  <!-- R1 -->
+  <g id="R1">
+    <rect class="block" x="560" y="200" width="150" height="180" rx="2"/>
+    <rect class="block-hdr" x="560" y="200" width="150" height="36" rx="2"/>
+    <text class="t-ref" x="572" y="223">R1</text>
+    <text class="t-block" x="604" y="223">Shunt</text>
+    <text class="t-note" x="572" y="254">250 ohm +/-0.1%</text>
+    <text class="t-note" x="572" y="270">4-20 mA to 1-5 V</text>
+    <path class="wire" d="M 610 300 h12 l6-10 12 20 12-20 12 20 12-20 6 10 h12"/>
+    <line class="pin" x1="560" y1="300" x2="550" y2="300"/>
+    <text class="t-pin" x="572" y="294">high</text>
+    <line class="pin" x1="635" y1="340" x2="635" y2="380"/>
+    <text class="t-pin" x="642" y="360">low</text>
+  </g>
+
+  <!-- U2 -->
+  <g id="U2">
+    <rect class="block" x="800" y="140" width="200" height="280" rx="2"/>
+    <rect class="block-hdr" x="800" y="140" width="200" height="36" rx="2"/>
+    <text class="t-ref" x="812" y="163">U2</text>
+    <text class="t-block" x="846" y="163">ADS1115 @ 5 V</text>
+    <text class="t-note" x="812" y="194">I2C 0x48 · ch0 · PGA +/-6.144 V</text>
+    <line class="pin" x1="790" y1="240" x2="800" y2="240"/>
+    <text class="t-pin" x="812" y="244">AIN0</text>
+    <line class="pin" x1="790" y1="280" x2="800" y2="280"/>
+    <text class="t-pin" x="812" y="284">GND</text>
+    <line class="pin" x1="790" y1="320" x2="800" y2="320"/>
+    <text class="t-pin" x="812" y="324">ADDR-&gt;GND</text>
+    <line class="pin" x1="790" y1="360" x2="800" y2="360"/>
+    <text class="t-pin" x="812" y="364">VDD</text>
+    <line class="pin" x1="1000" y1="250" x2="1010" y2="250"/>
+    <text class="t-pin" x="958" y="254">SDA</text>
+    <line class="pin" x1="1000" y1="290" x2="1010" y2="290"/>
+    <text class="t-pin" x="958" y="294">SCL</text>
+    <text class="t-note" x="812" y="400">AIN1-3, ALERT unused (omit)</text>
+  </g>
+
+  <!-- U3 -->
+  <g id="U3">
+    <rect class="block" x="1100" y="140" width="200" height="280" rx="2"/>
+    <rect class="block-hdr" x="1100" y="140" width="200" height="36" rx="2"/>
+    <text class="t-ref" x="1112" y="163">U3</text>
+    <text class="t-block" x="1146" y="163">Level Shifter</text>
+    <text class="t-note" x="1112" y="194">4 Bi-Dir LLC (blue module)</text>
+    <line class="pin" x1="1090" y1="250" x2="1100" y2="250"/>
+    <text class="t-pin" x="1112" y="244">B1</text>
+    <line class="pin" x1="1090" y1="290" x2="1100" y2="290"/>
+    <text class="t-pin" x="1112" y="284">B2</text>
+    <line class="pin" x1="1090" y1="340" x2="1100" y2="340"/>
+    <text class="t-pin" x="1112" y="334">HV</text>
+    <line class="pin" x1="1090" y1="380" x2="1100" y2="380"/>
+    <text class="t-pin" x="1112" y="374">GND</text>
+    <line class="pin" x1="1300" y1="250" x2="1310" y2="250"/>
+    <text class="t-pin" x="1260" y="244">A1</text>
+    <line class="pin" x1="1300" y1="290" x2="1310" y2="290"/>
+    <text class="t-pin" x="1260" y="284">A2</text>
+    <line class="pin" x1="1300" y1="340" x2="1310" y2="340"/>
+    <text class="t-pin" x="1260" y="334">LV</text>
+    <line class="pin" x1="1300" y1="380" x2="1310" y2="380"/>
+    <text class="t-pin" x="1252" y="374">GND</text>
+    <text class="t-note" x="1112" y="400">A3/A4/B3/B4 unused (omit)</text>
+  </g>
+
+  <!-- U1 -->
+  <g id="U1">
+    <rect class="block" x="1390" y="140" width="170" height="280" rx="2"/>
+    <rect class="block-hdr" x="1390" y="140" width="170" height="36" rx="2"/>
+    <text class="t-ref" x="1402" y="163">U1</text>
+    <text class="t-block" x="1434" y="163">Pi 4</text>
+    <text class="t-note" x="1402" y="194">40-pin header</text>
+    <line class="pin" x1="1380" y1="250" x2="1390" y2="250"/>
+    <text class="t-pin" x="1402" y="244">GPIO2 SDA</text>
+    <text class="t-pin" x="1402" y="258">pin 3</text>
+    <line class="pin" x1="1380" y1="290" x2="1390" y2="290"/>
+    <text class="t-pin" x="1402" y="284">GPIO3 SCL</text>
+    <text class="t-pin" x="1402" y="298">pin 5</text>
+    <line class="pin" x1="1380" y1="340" x2="1390" y2="340"/>
+    <text class="t-pin" x="1402" y="334">3V3 pin 1</text>
+    <line class="pin" x1="1380" y1="380" x2="1390" y2="380"/>
+    <text class="t-pin" x="1402" y="374">GND pin 6</text>
+    <text class="t-note" x="1402" y="408">5V pin 2 or 4</text>
+    <text class="t-note" x="1402" y="422">(which: TBD)</text>
+  </g>
+
+  <!-- +24V_LOOP -->
+  <path class="wire" d="M 236 270 H 300"/>
+  <circle class="dot" cx="236" cy="270" r="2.5"/>
+  <circle class="dot" cx="300" cy="270" r="2.5"/>
+  <text class="t-net" x="248" y="262">+24V_LOOP</text>
+
+  <!-- NET_SHUNT_HIGH J1- to R1 -->
+  <path class="wire" d="M 480 300 H 550"/>
+  <circle class="dot" cx="480" cy="300" r="2.5"/>
+  <circle class="dot" cx="550" cy="300" r="2.5"/>
+  <text class="t-net" x="488" y="292">NET_SHUNT_HIGH</text>
+  <text class="t-note" x="488" y="318">(via NET_LOOP_RETURN)</text>
+
+  <!-- R1 high to AIN0 -->
+  <path class="wire" d="M 635 300 H 720 V 240 H 790"/>
+  <circle class="dot" cx="635" cy="300" r="3"/>
+  <circle class="dot" cx="790" cy="240" r="2.5"/>
+  <text class="t-net" x="700" y="232">NET_SHUNT_HIGH</text>
+
+  <!-- GND bus -->
+  <path class="wire-gnd" d="M 100 480 H 1480"/>
+  <text class="t-net" x="110" y="472">GND  (star · includes bonded 0V_LOOP)</text>
+
+  <path class="wire" d="M 236 330 H 260 V 480"/>
+  <circle class="dot" cx="260" cy="480" r="3"/>
+  <text class="t-net" x="242" y="360">0V_LOOP</text>
+  <text class="t-note" x="242" y="374">-&gt; GND star</text>
+
+  <path class="wire" d="M 635 380 V 480"/>
+  <circle class="dot" cx="635" cy="480" r="3"/>
+
+  <path class="wire" d="M 790 280 H 760 V 480"/>
+  <circle class="dot" cx="760" cy="480" r="3"/>
+  <path class="wire" d="M 790 320 H 770 V 280"/>
+  <circle class="dot" cx="770" cy="280" r="2.5"/>
+  <text class="t-net" x="724" y="272">GND</text>
+
+  <path class="wire" d="M 1090 380 H 1060 V 480"/>
+  <circle class="dot" cx="1060" cy="480" r="3"/>
+  <path class="wire" d="M 1310 380 H 1340 V 480"/>
+  <circle class="dot" cx="1340" cy="480" r="3"/>
+  <path class="wire" d="M 1380 380 H 1360 V 480"/>
+  <circle class="dot" cx="1360" cy="480" r="3"/>
+
+  <g transform="translate(620,480)">
+    <line class="wire" x1="0" y1="0" x2="0" y2="10"/>
+    <line class="wire" x1="-14" y1="10" x2="14" y2="10"/>
+    <line class="wire" x1="-9" y1="15" x2="9" y2="15"/>
+    <line class="wire" x1="-4" y1="20" x2="4" y2="20"/>
+  </g>
+  <text class="t-note" x="642" y="500">star near shunt-low / brass bar</text>
+
+  <!-- I2C 5V -->
+  <path class="wire" d="M 1010 250 H 1090"/>
+  <circle class="dot" cx="1010" cy="250" r="2.5"/>
+  <circle class="dot" cx="1090" cy="250" r="2.5"/>
+  <text class="t-net" x="1020" y="242">I2C_SDA_5V</text>
+  <path class="wire" d="M 1010 290 H 1090"/>
+  <circle class="dot" cx="1010" cy="290" r="2.5"/>
+  <circle class="dot" cx="1090" cy="290" r="2.5"/>
+  <text class="t-net" x="1020" y="282">I2C_SCL_5V</text>
+
+  <!-- I2C 3V3 -->
+  <path class="wire" d="M 1310 250 H 1380"/>
+  <circle class="dot" cx="1310" cy="250" r="2.5"/>
+  <circle class="dot" cx="1380" cy="250" r="2.5"/>
+  <text class="t-net" x="1314" y="242">I2C_SDA_3V3</text>
+  <path class="wire" d="M 1310 290 H 1380"/>
+  <circle class="dot" cx="1310" cy="290" r="2.5"/>
+  <circle class="dot" cx="1380" cy="290" r="2.5"/>
+  <text class="t-net" x="1314" y="282">I2C_SCL_3V3</text>
+
+  <!-- +3V3_PI -->
+  <path class="wire" d="M 1380 340 H 1310"/>
+  <circle class="dot" cx="1380" cy="340" r="2.5"/>
+  <circle class="dot" cx="1310" cy="340" r="2.5"/>
+  <text class="t-net" x="1320" y="332">+3V3_PI</text>
+
+  <!-- +5V_ADS bus -->
+  <path class="wire" d="M 1470 120 H 820"/>
+  <text class="t-net" x="1120" y="112">+5V_ADS</text>
+  <path class="wire" d="M 1470 120 V 200 H 1560"/>
+  <circle class="dot" cx="1470" cy="200" r="2.5"/>
+  <text class="t-note" x="1480" y="192">U1 5V (pin 2 or 4)</text>
+  <path class="wire" d="M 1080 120 V 340 H 1090"/>
+  <circle class="dot" cx="1080" cy="120" r="3"/>
+  <circle class="dot" cx="1090" cy="340" r="2.5"/>
+  <path class="wire" d="M 820 120 V 360 H 790"/>
+  <circle class="dot" cx="820" cy="120" r="3"/>
+  <circle class="dot" cx="790" cy="360" r="2.5"/>
+  <circle class="dot" cx="1470" cy="120" r="3"/>
+
+  <!-- Legend -->
+  <g id="legend">
+    <rect class="block" x="56" y="540" width="520" height="200" rx="2"/>
+    <rect class="block-hdr" x="56" y="540" width="520" height="28" rx="2"/>
+    <text class="t-block" x="68" y="559">Designator map (CONNECTIONS.md names)</text>
+    <text class="t-tb" x="68" y="588">PS1  &lt;-  PSU_MW     Mean Well DIN 24 V</text>
+    <text class="t-tb" x="68" y="608">J1   &lt;-  TT_RM      Rosemount 2-wire TT terminals</text>
+    <text class="t-tb" x="68" y="628">R1   &lt;-  RS250      250 ohm shunt (+/-0.1%)</text>
+    <text class="t-tb" x="68" y="648">U2   &lt;-  U_ADS      ADS1115 breakout @ 5 V, ADDR-&gt;GND = 0x48</text>
+    <text class="t-tb" x="68" y="668">U3   &lt;-  U_LLC      4 Bi-Directional Level Shifters</text>
+    <text class="t-tb" x="68" y="688">U1   &lt;-  U_PI       Raspberry Pi 4 Model B</text>
+    <text class="t-note" x="68" y="716">Omitted (not permanent / unverified): Fluke 789, pump relay GPIO17, WebSocket / UI software.</text>
+    <text class="t-note" x="68" y="732">Unused pins omitted (AIN1-3, LLC A3/A4/B3/B4, ALERT) - no invented GND ties.</text>
+  </g>
+
+  <!-- Notes -->
+  <g id="notes">
+    <rect class="block" x="592" y="540" width="520" height="200" rx="2"/>
+    <rect class="block-hdr" x="592" y="540" width="520" height="28" rx="2"/>
+    <text class="t-block" x="604" y="559">Confirmed loop math</text>
+    <text class="t-tb" x="604" y="588">V = I x 250 ohm · 4 mA -&gt; 1.000 V · 20 mA -&gt; 5.000 V</text>
+    <text class="t-tb" x="604" y="608">8.00 mA -&gt; 2.000 V -&gt; 25% span (bench / Fluke checkout)</text>
+    <text class="t-tb" x="604" y="636">Series loop: PS1 +V -&gt; J1+ -&gt; J1- -&gt; R1 -&gt; GND / PS1 -V</text>
+    <text class="t-tb" x="604" y="656">Sense: NET_SHUNT_HIGH -&gt; U2 AIN0 (vs GND)</text>
+    <text class="t-tb" x="604" y="676">I2C: U1 GPIO2/3 &lt;-&gt; U3 A1/A2 &lt;-&gt; U3 B1/B2 &lt;-&gt; U2 SDA/SCL</text>
+    <text class="t-note" x="604" y="708">PE / brass ground bar lands on same GND star (CONNECTIONS §1).</text>
+    <text class="t-note" x="604" y="724">No optional AIN0 clamp shown - not in CONNECTIONS permanent BOM.</text>
+  </g>
+
+  <!-- Title block -->
+  <g id="titleblock">
+    <rect class="block" x="1128" y="540" width="432" height="200" rx="2"/>
+    <line class="wire" x1="1128" y1="580" x2="1560" y2="580"/>
+    <line class="wire" x1="1128" y1="620" x2="1560" y2="620"/>
+    <line class="wire" x1="1128" y1="660" x2="1560" y2="660"/>
+    <line class="wire" x1="1128" y1="700" x2="1560" y2="700"/>
+    <line class="wire" x1="1344" y1="620" x2="1344" y2="740"/>
+    <line class="wire" x1="1452" y1="620" x2="1452" y2="740"/>
+
+    <text class="t-tb-b" x="1140" y="566">PROJECT</text>
+    <text class="t-tb-b" x="1220" y="566">DCS - Distributed Control System (bench)</text>
+
+    <text class="t-tb-b" x="1140" y="606">TITLE</text>
+    <text class="t-tb" x="1220" y="606">Block schematic - loop, shunt, ADS1115, LLC, Pi</text>
+
+    <text class="t-tb-b" x="1140" y="646">DWG</text>
+    <text class="t-tb" x="1180" y="646">SCH-DCS-003</text>
+    <text class="t-tb-b" x="1356" y="646">REV</text>
+    <text class="t-tb-b" x="1390" y="646">E</text>
+    <text class="t-tb-b" x="1464" y="646">SHEET</text>
+    <text class="t-tb" x="1510" y="646">1 / 1</text>
+
+    <text class="t-tb-b" x="1140" y="686">DATE</text>
+    <text class="t-tb" x="1180" y="686">2026-09-28</text>
+    <text class="t-tb-b" x="1356" y="686">SCALE</text>
+    <text class="t-tb" x="1400" y="686">NTS</text>
+    <text class="t-tb-b" x="1464" y="686">SIZE</text>
+    <text class="t-tb" x="1504" y="686">A3L</text>
+
+    <text class="t-note" x="1140" y="722">Truth: CONNECTIONS.md rev D · No company branding</text>
+    <text class="t-note" x="1140" y="736">Human-readable drawing - not the SKiDL auto-layout .kicad_sch</text>
+  </g>
+</svg>
