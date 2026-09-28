@@ -36,14 +36,6 @@ Blue level-shifter module on the green perfboard:
 
 *Photo (lightly cleaned).*
 
-### Photoreal composite (grounded in that build)
-
-Same internals arranged in an open enclosure with a Rosemount-style transmitter on the 4–20 mA loop (and optional Fluke as test gear). **Not a single photograph** — generated to match the real parts above.
-
-![Photoreal composite — junction box grounded in bench build](docs/images/dcs_bom_junction_box_illustration.png)
-
-*Photoreal composite grounded in the bench build (not a single photograph).*
-
 ---
 
 ## What it measured
@@ -116,7 +108,7 @@ DCS/
 ├── docs/
 │   ├── historian.md      # Short project decision log
 │   ├── hardware/         # CONNECTIONS.md + schematic-blocks SVG/PDF + notes
-│   └── images/           # App screenshots, bench photos, composite
+│   └── images/           # App screenshots, real bench photos
 └── README.md
 ```
 

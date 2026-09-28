@@ -49,8 +49,7 @@ Shunt confirmation from terminal: `V≈2.00 @ I≈8.02 mA` ⇒ **R≈250 Ω**.
 
 Amazon reference links (same family as purchased): OONO GPIO TB [B084C69VSQ](https://www.amazon.com/dp/B084C69VSQ), Mean Well HDR-15-24 [B0C9C4LNR4](https://www.amazon.com/dp/B0C9C4LNR4), PT 4-HESI fuse TBs [B0D59WVSKS](https://www.amazon.com/dp/B0D59WVSKS).
 
-Photos: `docs/images/photo_assembled_stack.png`, `photo_fluke_789_8mA.png`, `photo_level_shifter.png`.  
-Photoreal composite (not a single photo): `docs/images/dcs_bom_junction_box_illustration.png`.
+Photos: `docs/images/photo_assembled_stack.png`, `photo_fluke_789_8mA.png`, `photo_level_shifter.png`.
 
 ## Pinout (copy)
 
