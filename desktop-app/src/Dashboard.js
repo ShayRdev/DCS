@@ -239,7 +239,7 @@ function Dashboard() {
               {tempDisplay}
               <span>°C</span>
             </div>
-            <div className="temp-tag">ADS1115 AIN0 · 4–20 mA loop</div>
+            <div className="temp-tag">ADS1115 AIN0 · 250 Ω · 4–20 mA loop</div>
           </div>
 
           <div className="metrics">

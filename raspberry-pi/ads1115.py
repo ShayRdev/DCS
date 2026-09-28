@@ -27,13 +27,13 @@ _MUX_SINGLE = {
     2: 0x6000,
     3: 0x7000,
 }
-# PGA ±4.096 V → 1 LSB = 125 µV
-_PGA_4_096 = 0x0200
+# PGA ±6.144 V → covers 1–5 V from a 250 Ω shunt at 4–20 mA (ADS @ 5 V)
+_PGA_6_144 = 0x0000
 _MODE_SINGLE = 0x0100
 _DR_128SPS = 0x0080
 _COMP_QUE_DISABLE = 0x0003
 
-_FS_VOLTS = 4.096
+_FS_VOLTS = 6.144
 _LSB = _FS_VOLTS / 32768.0
 
 
@@ -64,7 +64,7 @@ class ADS1115:
         cfg = (
             _OS_SINGLE
             | _MUX_SINGLE[channel]
-            | _PGA_4_096
+            | _PGA_6_144
             | _MODE_SINGLE
             | _DR_128SPS
             | _COMP_QUE_DISABLE

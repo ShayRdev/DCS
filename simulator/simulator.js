@@ -7,7 +7,7 @@
 const WebSocket = require('ws');
 
 const PORT = Number(process.env.DCS_WS_PORT || 8765);
-const SHUNT = Number(process.env.DCS_SHUNT_OHMS || 100);
+const SHUNT = Number(process.env.DCS_SHUNT_OHMS || 250);
 const LRV = Number(process.env.DCS_LRV_C || 0);
 const URV = Number(process.env.DCS_URV_C || 100);
 
@@ -64,8 +64,9 @@ wss.on('connection', (ws) => {
 
 setInterval(() => {
   const payload = sample();
+  const span = ((payload.current_ma - 4) / 16) * 100;
   console.log(
-    `TT  ${payload.temperature_c.toFixed(2)} °C   I=${payload.current_ma.toFixed(3)} mA   V=${payload.voltage_v.toFixed(4)} V`
+    `V=${payload.voltage_v.toFixed(3)} V  I=${payload.current_ma.toFixed(2)} mA  %Span=${span.toFixed(1)}%  TT=${payload.temperature_c.toFixed(2)} °C`
   );
   broadcast(payload);
 }, 500);
