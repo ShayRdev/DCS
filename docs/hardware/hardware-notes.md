@@ -1,6 +1,6 @@
 # Hardware notes — DCS
 
-Revision **C** · 2026-09-27 · companions: `schematic-blocks.svg` / `.pdf` (**SCH-DCS-003** rev E, preferred human-readable), `schematic-overview.pdf` (SCH-DCS-001), `pinout.pdf` (SCH-DCS-002)
+Revision **C** · 2026-09-27 · companions: `schematic-blocks.svg` / `.pdf` (**SCH-DCS-003** rev F, preferred human-readable), `schematic-overview.pdf` (SCH-DCS-001), `pinout.pdf` (SCH-DCS-002)
 
 Open the **PDF** drawings in this folder (GitHub does not render PDF as inline Markdown images).
 

@@ -167,7 +167,7 @@ Full netlist / pin tables for SKiDL or KiCad (Markdown):
 
 Clean left→right block drawing (portfolio / review). Open the SVG or PDF — do **not** use the auto-placed SKiDL `.kicad_sch` for display:
 
-- **[docs/hardware/schematic-blocks.svg](docs/hardware/schematic-blocks.svg)** — **SCH-DCS-003** rev **E** (primary)
+- **[docs/hardware/schematic-blocks.svg](docs/hardware/schematic-blocks.svg)** — **SCH-DCS-003** rev **F** (primary, IEEE/IEC symbols)
 - **[docs/hardware/schematic-blocks.pdf](docs/hardware/schematic-blocks.pdf)** — same drawing as PDF
 - Older overview/pinout sheets (rev C): [schematic-overview.pdf](docs/hardware/schematic-overview.pdf) · [pinout.pdf](docs/hardware/pinout.pdf)
 - [docs/hardware/hardware-notes.md](docs/hardware/hardware-notes.md)
