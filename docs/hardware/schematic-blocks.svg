@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1480" height="780" viewBox="0 0 1480 780">
+<title>DCS SCH-DCS-003 Rev H</title>
+<desc>Electrical schematic from CONNECTIONS.md rev E. F1 in +24 feed.</desc>
+<defs>
+<style><![CDATA[
+  .bg { fill:#e8ecf0; }
+  .sheet { fill:#ffffff; stroke:#0f172a; stroke-width:1.15; }
+  .frame { fill:none; stroke:#0f172a; stroke-width:2; }
+  .w { fill:none; stroke:#0f172a; stroke-width:1.2; stroke-linecap:square; stroke-linejoin:miter; }
+  .wb { fill:none; stroke:#0f172a; stroke-width:1.45; }
+  .symf { fill:#ffffff; stroke:#0f172a; stroke-width:1.3; }
+  .dot { fill:#0f172a; }
+  .ref { font-family:"IBM Plex Mono",Consolas,"Courier New",monospace; font-size:11px; font-weight:700; fill:#075985; }
+  .val { font-family:"IBM Plex Sans",Helvetica,Arial,sans-serif; font-size:10px; fill:#1e293b; }
+  .pin { font-family:"IBM Plex Mono",Consolas,"Courier New",monospace; font-size:8px; fill:#334155; }
+  .net { font-family:"IBM Plex Mono",Consolas,"Courier New",monospace; font-size:8.5px; font-weight:600; fill:#075985; }
+  .note { font-family:"IBM Plex Sans",Helvetica,Arial,sans-serif; font-size:8px; fill:#64748b; }
+  .tb { font-family:"IBM Plex Sans",Helvetica,Arial,sans-serif; font-size:9px; fill:#0f172a; }
+  .tbb { font-family:"IBM Plex Sans",Helvetica,Arial,sans-serif; font-size:9.5px; font-weight:700; fill:#0f172a; }
+  .hdr { font-family:"IBM Plex Sans",Helvetica,Arial,sans-serif; font-size:12px; font-weight:700; fill:#0f172a; }
+]]></style>
+<g id="pwr">
+  <circle cx="0" cy="0" r="5.5" fill="#fff" stroke="#0f172a" stroke-width="1.2"/>
+  <line x1="0" y1="-5.5" x2="0" y2="7" stroke="#0f172a" stroke-width="1.2"/>
+</g>
+<g id="gnd">
+  <line x1="0" y1="0" x2="0" y2="4" stroke="#0f172a" stroke-width="1.2"/>
+  <line x1="-7.5" y1="4" x2="7.5" y2="4" stroke="#0f172a" stroke-width="1.2"/>
+  <line x1="-4.5" y1="7" x2="4.5" y2="7" stroke="#0f172a" stroke-width="1.2"/>
+  <line x1="-1.8" y1="10" x2="1.8" y2="10" stroke="#0f172a" stroke-width="1.2"/>
+</g>
+</defs>
+
+<rect class="bg" width="1480" height="780"/>
+<rect class="frame" x="14" y="14" width="1452" height="752"/>
+<rect class="sheet" x="22" y="22" width="1436" height="736"/>
+<text class="hdr" x="36" y="44">DCS process loop &amp; ADC interface</text>
+<text class="note" x="36" y="57">CONNECTIONS.md rev E · SCH-DCS-003 rev H · unused pins omitted · F1 amp rating TBD</text>
+<g id="PS1">
+<text class="ref" x="36" y="118">PS1</text>
+<text class="val" x="36" y="130">Mean Well 24V</text>
+<circle cx="58" cy="200" r="3.8" fill="#fff" stroke="#0f172a" stroke-width="1.25"/>
+<path class="w" d="M 42 200 H 54"/>
+<text class="pin" x="38" y="203" text-anchor="end">L</text>
+<circle cx="58" cy="228" r="3.8" fill="#fff" stroke="#0f172a" stroke-width="1.25"/>
+<path class="w" d="M 42 228 H 54"/>
+<text class="pin" x="38" y="231" text-anchor="end">N</text>
+<circle cx="96" cy="200" r="3.8" fill="#fff" stroke="#0f172a" stroke-width="1.25"/>
+<circle cx="96" cy="255" r="3.8" fill="#fff" stroke="#0f172a" stroke-width="1.25"/>
+<path class="w" d="M 100 200 H 112"/>
+<path class="w" d="M 100 255 H 112"/>
+<text class="pin" x="78" y="193">+V</text>
+<text class="pin" x="78" y="252">-V</text>
+<path class="w" d="M 66 182 V 270 H 88 V 182" fill="none"/>
+<text class="note" x="36" y="288">PSU_MW</text>
+</g>
+<g id="F1">
+<text class="ref" x="148" y="158">F1</text>
+<text class="val" x="148" y="170">PT 4-HESI</text>
+<text class="note" x="148" y="182">5x20 amp TBD</text>
+<path class="w" d="M 140 200 H 152"/>
+<path class="w" d="M 193 200 H 205"/>
+<rect class="symf" x="152" y="191" width="41" height="18"/>
+<path class="wb" d="M 158 200 H 164 Q 172 194 180 200 Q 188 206 196 200 H 187"/>
+</g>
+<g id="J1">
+<text class="ref" x="250" y="158">J1</text>
+<text class="val" x="250" y="170">Rosemount</text>
+<text class="note" x="250" y="182">4-20mA TT</text>
+<circle cx="268" cy="200" r="3.8" fill="#fff" stroke="#0f172a" stroke-width="1.25"/>
+<circle cx="268" cy="236" r="3.8" fill="#fff" stroke="#0f172a" stroke-width="1.25"/>
+<path class="w" d="M 254 200 H 264"/>
+<path class="w" d="M 272 236 H 290"/>
+<text class="pin" x="274" y="194">+</text>
+<text class="pin" x="274" y="248">-</text>
+</g>
+<g id="R1">
+<path class="wb" d="M 360 236 V 248 l -9 6 18 10 -18 10 18 10 -18 10 9 6 V 340"/>
+<text class="ref" x="374" y="285">R1</text>
+<text class="val" x="374" y="297">250R</text>
+<text class="note" x="374" y="309">0.1%</text>
+</g>
+<g id="U2">
+<rect class="symf" x="470" y="140" width="68" height="130"/>
+<path class="w" d="M 499.0 140 A 5 5 0 0 0 509.0 140" fill="#fff"/>
+<text class="ref" x="470" y="128">U2</text>
+<text class="val" x="470" y="138">ADS1115</text>
+<path class="w" d="M 459 162 H 470"/>
+<text class="pin" x="473" y="164.5">AIN0</text>
+<path class="w" d="M 459 188 H 470"/>
+<text class="pin" x="473" y="190.5">GND</text>
+<path class="w" d="M 459 212 H 470"/>
+<text class="pin" x="473" y="214.5">ADDR</text>
+<path class="w" d="M 459 245 H 470"/>
+<text class="pin" x="473" y="247.5">VDD</text>
+<path class="w" d="M 538 176 H 549"/>
+<text class="pin" x="535" y="178.5" text-anchor="end">SDA</text>
+<path class="w" d="M 538 204 H 549"/>
+<text class="pin" x="535" y="206.5" text-anchor="end">SCL</text>
+<text class="note" x="470" y="280">0x48 PGA+/-6.144</text>
+</g>
+<g id="U3">
+<rect class="symf" x="680" y="140" width="78" height="130"/>
+<line class="w" x1="719.0" y1="148" x2="719.0" y2="262" stroke-dasharray="2 2"/>
+<text class="ref" x="680" y="128">U3</text>
+<text class="val" x="680" y="138">4ch LLC</text>
+<text class="pin" x="683" y="151">HV</text>
+<text class="pin" x="755" y="151" text-anchor="end">LV</text>
+<path class="w" d="M 669 166 H 680"/>
+<text class="pin" x="683" y="168.5">B1</text>
+<path class="w" d="M 669 190 H 680"/>
+<text class="pin" x="683" y="192.5">B2</text>
+<path class="w" d="M 669 220 H 680"/>
+<text class="pin" x="683" y="222.5">HV</text>
+<path class="w" d="M 669 248 H 680"/>
+<text class="pin" x="683" y="250.5">GND</text>
+<path class="w" d="M 758 166 H 769"/>
+<text class="pin" x="755" y="168.5" text-anchor="end">A1</text>
+<path class="w" d="M 758 190 H 769"/>
+<text class="pin" x="755" y="192.5" text-anchor="end">A2</text>
+<path class="w" d="M 758 220 H 769"/>
+<text class="pin" x="755" y="222.5" text-anchor="end">LV</text>
+<path class="w" d="M 758 248 H 769"/>
+<text class="pin" x="755" y="250.5" text-anchor="end">GND</text>
+<text class="note" x="680" y="280">unused NC</text>
+</g>
+<g id="U1">
+<rect class="symf" x="920" y="125" width="62" height="160"/>
+<text class="ref" x="920" y="113">U1</text>
+<text class="val" x="920" y="123">Pi 4</text>
+<path class="w" d="M 909 147 H 920"/>
+<text class="pin" x="923" y="146">GPIO2</text>
+<text class="pin" x="923" y="156">SDA p3</text>
+<path class="w" d="M 909 173 H 920"/>
+<text class="pin" x="923" y="172">GPIO3</text>
+<text class="pin" x="923" y="182">SCL p5</text>
+<path class="w" d="M 909 205 H 920"/>
+<text class="pin" x="923" y="204">3V3</text>
+<text class="pin" x="923" y="214">pin 1</text>
+<path class="w" d="M 909 235 H 920"/>
+<text class="pin" x="923" y="234">5V</text>
+<text class="pin" x="923" y="244">pin 2/4</text>
+<path class="w" d="M 909 265 H 920"/>
+<text class="pin" x="923" y="264">GND</text>
+<text class="pin" x="923" y="274">pin 6</text>
+<text class="note" x="920" y="295">5V pin TBD</text>
+</g>
+<path class="w" d="M 112 200 H 140"/>
+<circle class="dot" cx="112" cy="200" r="2.25"/>
+<circle class="dot" cx="140" cy="200" r="2.25"/>
+<text class="net" x="118" y="214">+24V_PSU</text>
+<path class="w" d="M 205 200 H 254"/>
+<circle class="dot" cx="205" cy="200" r="2.25"/>
+<circle class="dot" cx="254" cy="200" r="2.25"/>
+<text class="net" x="212" y="214">+24V_LOOP</text>
+<use href="#pwr" x="232" y="172"/>
+<path class="w" d="M 232 178 V 200"/>
+<circle class="dot" cx="232" cy="200" r="2.25"/>
+<text class="net" x="240" y="170">+24V</text>
+<path class="w" d="M 290 236 H 360"/>
+<circle class="dot" cx="290" cy="236" r="2.25"/>
+<circle class="dot" cx="360" cy="236" r="2.25"/>
+<text class="net" x="292" y="228">NET_SHUNT_HIGH</text>
+<path class="w" d="M 360 236 H 420 V 162 H 459"/>
+<circle class="dot" cx="420" cy="236" r="2.25"/>
+<circle class="dot" cx="459" cy="162" r="2.25"/>
+<path class="w" d="M 360 340 V 450"/>
+<circle class="dot" cx="360" cy="450" r="2.25"/>
+<path class="wb" d="M 50 450 H 1080"/>
+<text class="net" x="54" y="443">GND</text>
+<use href="#gnd" x="360" y="450"/>
+<text class="note" x="372" y="464">star @ shunt-low / brass bar</text>
+<path class="w" d="M 112 255 H 128 V 450"/>
+<circle class="dot" cx="128" cy="450" r="2.25"/>
+<text class="net" x="132" y="269">0V_LOOP</text>
+<path class="w" d="M 459 188 H 448 V 450"/>
+<circle class="dot" cx="448" cy="450" r="2.25"/>
+<path class="w" d="M 459 212 H 440 V 188"/>
+<circle class="dot" cx="440" cy="188" r="2.25"/>
+<text class="net" x="412" y="182">GND</text>
+<path class="w" d="M 669 248 H 660 V 450"/>
+<circle class="dot" cx="660" cy="450" r="2.25"/>
+<path class="w" d="M 769 248 H 790 V 450"/>
+<circle class="dot" cx="790" cy="450" r="2.25"/>
+<path class="w" d="M 909 265 H 900 V 450"/>
+<circle class="dot" cx="900" cy="450" r="2.25"/>
+<path class="w" d="M 549 176 H 669"/>
+<circle class="dot" cx="549" cy="176" r="2.25"/>
+<circle class="dot" cx="669" cy="166" r="2.25"/>
+<text class="net" x="560" y="169">I2C_SDA_5V</text>
+<path class="w" d="M 549 204 H 669"/>
+<circle class="dot" cx="549" cy="204" r="2.25"/>
+<circle class="dot" cx="669" cy="190" r="2.25"/>
+<text class="net" x="560" y="197">I2C_SCL_5V</text>
+<path class="w" d="M 769 166 H 909"/>
+<circle class="dot" cx="769" cy="166" r="2.25"/>
+<circle class="dot" cx="909" cy="147" r="2.25"/>
+<text class="net" x="800" y="159">I2C_SDA_3V3</text>
+<path class="w" d="M 769 190 H 909"/>
+<circle class="dot" cx="769" cy="190" r="2.25"/>
+<circle class="dot" cx="909" cy="173" r="2.25"/>
+<text class="net" x="800" y="183">I2C_SCL_3V3</text>
+<path class="w" d="M 909 205 H 769"/>
+<circle class="dot" cx="909" cy="205" r="2.25"/>
+<circle class="dot" cx="769" cy="220" r="2.25"/>
+<text class="net" x="820" y="198">+3V3_PI</text>
+<use href="#pwr" x="860" y="181"/>
+<path class="w" d="M 860 187 V 205"/>
+<circle class="dot" cx="860" cy="205" r="2.25"/>
+<text class="net" x="868" y="179">+3V3</text>
+<path class="w" d="M 909 235 H 900 V 100 H 440"/>
+<circle class="dot" cx="900" cy="100" r="2.25"/>
+<circle class="dot" cx="909" cy="235" r="2.25"/>
+<text class="net" x="620" y="94">+5V_ADS</text>
+<use href="#pwr" x="600" y="82"/>
+<path class="w" d="M 600 88 V 100"/>
+<circle class="dot" cx="600" cy="100" r="2.25"/>
+<text class="net" x="608" y="80">+5V</text>
+<path class="w" d="M 660 100 V 220 H 669"/>
+<circle class="dot" cx="660" cy="100" r="2.25"/>
+<circle class="dot" cx="669" cy="220" r="2.25"/>
+<path class="w" d="M 440 100 V 245 H 459"/>
+<circle class="dot" cx="440" cy="100" r="2.25"/>
+<circle class="dot" cx="459" cy="245" r="2.25"/>
+<g id="legend">
+  <text class="tbb" x="36" y="510">Designators</text>
+  <text class="tb" x="36" y="524">PS1=PSU_MW · F1=FU_HESI · J1=TT_RM · R1=RS250 · U2=U_ADS · U3=U_LLC · U1=U_PI</text>
+  <text class="note" x="36" y="538">+24V_PSU → F1 → +24V_LOOP → Rosemount. Fuse amp TBD. No Fluke/relay/software on sheet.</text>
+</g>
+<g id="tb">
+  <rect class="symf" x="1080" y="490" width="360" height="140"/>
+  <line class="w" x1="1080" y1="516" x2="1440" y2="516"/>
+  <line class="w" x1="1080" y1="542" x2="1440" y2="542"/>
+  <line class="w" x1="1080" y1="572" x2="1440" y2="572"/>
+  <line class="w" x1="1080" y1="600" x2="1440" y2="600"/>
+  <line class="w" x1="1250" y1="542" x2="1250" y2="630"/>
+  <line class="w" x1="1335" y1="542" x2="1335" y2="630"/>
+  <text class="tbb" x="1088" y="507">DCS — Distributed Control System (bench)</text>
+  <text class="tb" x="1088" y="532">PS1 · F1 · loop · 250R · ADS1115 · LLC · Pi 4</text>
+  <text class="tbb" x="1088" y="562">SCH-DCS-003</text>
+  <text class="tbb" x="1258" y="562">REV H</text>
+  <text class="tb" x="1343" y="562">1 / 1</text>
+  <text class="tb" x="1088" y="590">2026-09-28</text>
+  <text class="tb" x="1258" y="590">NTS</text>
+  <text class="tb" x="1343" y="590">A3L</text>
+  <text class="note" x="1088" y="618">Truth: CONNECTIONS.md · hand-drawn SVG (no KiCad)</text>
+</g>
+</svg>

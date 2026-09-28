@@ -7,7 +7,7 @@ Hardware path used on the bench:
 Default calibration (override with env / CLI):
   4 mA  → LRV (°C)
   20 mA → URV (°C)
-  shunt = 100 Ω  → 0.4 V @ 4 mA, 2.0 V @ 20 mA (fits ±4.096 V PGA)
+  shunt = 250 Ω  → 1.0 V @ 4 mA, 5.0 V @ 20 mA (ADS1115 at 5 V + level shifter)
 """
 
 from __future__ import annotations
@@ -28,7 +28,7 @@ class LoopReading:
 def voltage_to_loop(
     voltage_v: float,
     *,
-    shunt_ohms: float = 100.0,
+    shunt_ohms: float = 250.0,
     lrv_c: float = 0.0,
     urv_c: float = 100.0,
 ) -> LoopReading:

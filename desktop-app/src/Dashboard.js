@@ -43,6 +43,8 @@ function parseReading(raw) {
 function Dashboard() {
   const [wsUrl, setWsUrl] = useState(DEFAULT_WS);
   const [connected, setConnected] = useState(false);
+  const [reconnecting, setReconnecting] = useState(false);
+  const [hadLink, setHadLink] = useState(false);
   const [temperature, setTemperature] = useState(null);
   const [voltage, setVoltage] = useState(null);
   const [current, setCurrent] = useState(null);
@@ -70,6 +72,18 @@ function Dashboard() {
   useEffect(() => {
     let closed = false;
     let backoff = 600;
+    let linkedOnce = false;
+    setConnected(false);
+    setReconnecting(false);
+    setHadLink(false);
+
+    const scheduleReconnect = () => {
+      if (closed) return;
+      setReconnecting(true);
+      clearTimeout(reconnectRef.current);
+      reconnectRef.current = setTimeout(connect, backoff);
+      backoff = Math.min(backoff * 1.7, 8000);
+    };
 
     const connect = () => {
       if (closed) return;
@@ -78,9 +92,13 @@ function Dashboard() {
         wsRef.current = ws;
 
         ws.onopen = () => {
+          const wasLost = linkedOnce;
           setConnected(true);
+          setReconnecting(false);
+          setHadLink(true);
+          linkedOnce = true;
           backoff = 600;
-          pushLog(`connected ${wsUrl}`);
+          pushLog(wasLost ? `reconnected ${wsUrl}` : `connected ${wsUrl}`);
         };
 
         ws.onmessage = (event) => {
@@ -111,11 +129,10 @@ function Dashboard() {
 
         ws.onclose = () => {
           setConnected(false);
-          if (!closed) {
-            clearTimeout(reconnectRef.current);
-            reconnectRef.current = setTimeout(connect, backoff);
-            backoff = Math.min(backoff * 1.7, 8000);
+          if (linkedOnce) {
+            pushLog('Pi link lost — retrying…');
           }
+          scheduleReconnect();
         };
 
         ws.onerror = () => {
@@ -127,8 +144,7 @@ function Dashboard() {
         };
       } catch (err) {
         setConnected(false);
-        reconnectRef.current = setTimeout(connect, backoff);
-        backoff = Math.min(backoff * 1.7, 8000);
+        scheduleReconnect();
       }
     };
 
@@ -188,13 +204,32 @@ function Dashboard() {
           <div className="brand-sub">Desktop Control</div>
         </div>
         <div className="topbar-meta">
-          <div className={`conn`} title={wsUrl}>
+          <div
+            className={`conn ${connected ? 'live' : 'lost'}`}
+            title={wsUrl}
+            role="status"
+            aria-live="polite"
+          >
             <span className={`conn-dot ${connected ? 'ok' : ''}`} />
-            {connected ? 'Pi link live' : 'Pi link down'}
+            {connected
+              ? 'Pi link live'
+              : hadLink
+                ? 'Pi link lost'
+                : reconnecting
+                  ? 'Pi link connecting…'
+                  : 'Pi link connecting…'}
           </div>
           <span>{clock.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
         </div>
       </header>
+
+      {!connected && (
+        <div className="link-banner" role="alert">
+          {hadLink
+            ? 'Pi link lost — desktop is blind until reconnect. The Pi keeps sampling locally.'
+            : 'Connecting to Pi WebSocket…'}
+        </div>
+      )}
 
       <main className="layout">
         <aside className="panel">
@@ -204,7 +239,7 @@ function Dashboard() {
               {tempDisplay}
               <span>°C</span>
             </div>
-            <div className="temp-tag">ADS1115 AIN0 · 4–20 mA loop</div>
+            <div className="temp-tag">ADS1115 AIN0 · 250 Ω · 4–20 mA loop</div>
           </div>
 
           <div className="metrics">

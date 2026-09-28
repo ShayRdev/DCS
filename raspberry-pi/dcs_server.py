@@ -24,7 +24,7 @@ Environment:
     DCS_I2C_BUS=1
     DCS_ADS_ADDR=0x48
     DCS_ADC_CHANNEL=0
-    DCS_SHUNT_OHMS=100
+    DCS_SHUNT_OHMS=250
     DCS_LRV_C=0
     DCS_URV_C=100
     DCS_PUMP_GPIO=17
@@ -116,7 +116,7 @@ class AdcSource:
     def read_voltage(self) -> float:
         if self._ads is not None:
             return self._ads.read(self.args.channel).voltage_v
-        # Demo: ~8–16 mA into 100 Ω → ~0.8–1.6 V (room-temp-ish on 0–100 °C scale)
+        # Demo: ~8–16 mA into 250 Ω → ~2.0–4.0 V (matches bench Fluke span points)
         t = time.time() - self._t0
         ma = 12.0 + 4.0 * math.sin(t / 6.0)
         return (ma / 1000.0) * self.args.shunt_ohms
@@ -142,6 +142,7 @@ def build_payload(voltage_v: float, args: argparse.Namespace, pump_on: bool) -> 
         "lrv_c": loop.lrv_c,
         "urv_c": loop.urv_c,
         "channel": args.channel,
+        "span_pct": round((loop.current_ma - 4.0) / 16.0 * 100.0, 1),
         "pump": "on" if pump_on else "off",
         "ts": time.time(),
     }
@@ -199,10 +200,12 @@ async def run_server(args: argparse.Namespace) -> None:
                 voltage = adc.read_voltage()
                 payload = build_payload(voltage, args, pump.on)
                 # Terminal readout (what worked on the bench)
+                span = (payload['current_ma'] - 4.0) / 16.0 * 100.0
                 print(
-                    f"TT  {payload['temperature_c']:7.2f} °C   "
-                    f"I={payload['current_ma']:6.3f} mA   "
-                    f"V={payload['voltage_v']:6.4f} V   "
+                    f"V={payload['voltage_v']:.3f} V  "
+                    f"I={payload['current_ma']:.2f} mA  "
+                    f"%Span={span:.1f}%  "
+                    f"TT={payload['temperature_c']:.2f} °C  "
                     f"pump={'ON' if pump.on else 'off'}",
                     flush=True,
                 )
@@ -243,7 +246,7 @@ def parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
     p.add_argument("--i2c-bus", type=int, default=env_int("DCS_I2C_BUS", 1))
     p.add_argument("--ads-addr", type=int, default=env_int("DCS_ADS_ADDR", 0x48))
     p.add_argument("--channel", type=int, default=env_int("DCS_ADC_CHANNEL", 0))
-    p.add_argument("--shunt-ohms", type=float, default=env_float("DCS_SHUNT_OHMS", 100.0))
+    p.add_argument("--shunt-ohms", type=float, default=env_float("DCS_SHUNT_OHMS", 250.0))
     p.add_argument("--lrv-c", type=float, default=env_float("DCS_LRV_C", 0.0))
     p.add_argument("--urv-c", type=float, default=env_float("DCS_URV_C", 100.0))
     p.add_argument("--pump-gpio", type=int, default=env_int("DCS_PUMP_GPIO", 17))
