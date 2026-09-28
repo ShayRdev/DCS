@@ -1,12 +1,11 @@
 # Hardware notes — DCS
 
-Revision **C** · 2026-09-27 · companions: `schematic-blocks.svg` / `.pdf` (**SCH-DCS-003** rev G, preferred human-readable), `schematic-overview.pdf` (SCH-DCS-001), `pinout.pdf` (SCH-DCS-002)
+Revision **C** · 2026-09-27 · companions: `schematic-blocks.svg` / `.pdf` (**SCH-DCS-003** rev H, preferred human-readable), `schematic-overview.pdf` (SCH-DCS-001), `pinout.pdf` (SCH-DCS-002)
 
-Open the **PDF** drawings in this folder (GitHub does not render PDF as inline Markdown images).
+Open the **SVG/PDF** drawings in this folder (GitHub does not always inline PDF).
 
-**Wire-level netlist for SKiDL / KiCad (preferred):** [`CONNECTIONS.md`](CONNECTIONS.md)
-
-**SKiDL project (generates KiCad `.net` + BOM):** [`../../hardware/skidl/`](../../hardware/skidl/) — run `python3 main.py`; see `out/`.
+**Wire-level truth:** [`CONNECTIONS.md`](CONNECTIONS.md)  
+**Human-readable schematic:** [`schematic-blocks.svg`](schematic-blocks.svg) / [`schematic-blocks.pdf`](schematic-blocks.pdf)
 
 ## What this measured on the bench
 

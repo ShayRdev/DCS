@@ -1,9 +1,0 @@
-__pycache__/
-.venv/
-*.pyc
-*_sklib.py
-*.erc
-*.log
-!out/*.log
-!out/schematic.log
-!out/erc.log

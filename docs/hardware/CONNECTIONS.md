@@ -1,7 +1,7 @@
-# DCS — Wire-level connections (SKiDL / KiCad input)
+# DCS — Wire-level connections
 
 **Revision:** E · **Date:** 2026-09-28  
-**Audience:** Downstream schematic generation (SKiDL / KiCad). This file is the **netlist truth** in Markdown. Prefer this over PDF drawings for automated schematic build.
+**Audience:** Bench wiring and the human-readable schematic (`schematic-blocks.svg` / `.pdf`). This file is the **netlist truth** in Markdown.
 
 **Project one-liner:** Raspberry Pi 4 reads a Rosemount 2-wire 4–20 mA temperature transmitter through a **250 Ω** shunt into an **ADS1115** (5 V), with I²C crossing a blue **4 Bi-Directional Level Shifters** module on a green perfboard HAT; `dcs_server.py` prints `V` / `I` / `%Span` and serves WebSocket `:8765` to the desktop app.
 
@@ -69,7 +69,7 @@
 ## 3. Master connection table
 
 Columns: **From** → **To**, **Net**, **Notes**.  
-Ref designators are logical (`U_PI`, `U_LLC`, …), not KiCad library IDs.
+Ref designators are logical (`U_PI`, `U_LLC`, …), logical names (map to schematic designators in the drawing legend).
 
 ### 3.1 Power — Mean Well → fuse → loop
 
@@ -319,7 +319,7 @@ Bench Mac capture matched `V=… V  I=… mA  %Span=…%` at ~25 / 50 / 75% poin
 
 ---
 
-## 7. Net name checklist (for SKiDL)
+## 7. Net name checklist
 
 Must exist as named nets:
 

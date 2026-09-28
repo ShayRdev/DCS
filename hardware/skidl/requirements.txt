@@ -1,8 +1,0 @@
-# Core SKiDL (includes generate_netlist / generate_schematic / simp_sexp).
-# generate_schematic needs KiCad *symbol libraries* on disk (not a pip extra):
-# set KICAD8_SYMBOL_DIR (or KICAD9_/KICAD10_) — see README.md / schematic.py.
-skidl>=2.0.0
-
-# Declared so schematic environments pull the same transitive set SKiDL uses
-# for .kicad_sch S-expression IO and placement (normally installed with skidl).
-simp_sexp>=0.3.1
