@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-DCS Raspberry Pi service
+Loop Monitor Raspberry Pi service
 
 Reads a Rosemount temperature transmitter through an ADS1115 (I²C),
 prints live values to the terminal, and streams them to the desktop app
@@ -13,22 +13,22 @@ Usage (on the Pi):
     cd raspberry-pi
     python3 -m venv .venv && source .venv/bin/activate
     pip install -r requirements.txt
-    python3 dcs_server.py
+    python3 loop_monitor_server.py
 
 Demo / no-hardware mode:
-    python3 dcs_server.py --demo
+    python3 loop_monitor_server.py --demo
 
 Environment:
-    DCS_WS_HOST=0.0.0.0
-    DCS_WS_PORT=8765
-    DCS_I2C_BUS=1
-    DCS_ADS_ADDR=0x48
-    DCS_ADC_CHANNEL=0
-    DCS_SHUNT_OHMS=250
-    DCS_LRV_C=0
-    DCS_URV_C=100
-    DCS_PUMP_GPIO=17
-    DCS_SAMPLE_HZ=2
+    LOOP_MONITOR_WS_HOST=0.0.0.0
+    LOOP_MONITOR_WS_PORT=8765
+    LOOP_MONITOR_I2C_BUS=1
+    LOOP_MONITOR_ADS_ADDR=0x48
+    LOOP_MONITOR_ADC_CHANNEL=0
+    LOOP_MONITOR_SHUNT_OHMS=250
+    LOOP_MONITOR_LRV_C=0
+    LOOP_MONITOR_URV_C=100
+    LOOP_MONITOR_PUMP_GPIO=17
+    LOOP_MONITOR_SAMPLE_HZ=2
 """
 
 from __future__ import annotations
@@ -219,7 +219,7 @@ async def run_server(args: argparse.Namespace) -> None:
                 pass
 
     print(
-        f"[*] DCS Pi service  ws://{args.host}:{args.port}  "
+        f"[*] Loop Monitor Pi service  ws://{args.host}:{args.port}  "
         f"shunt={args.shunt_ohms}Ω  LRV={args.lrv_c}°C  URV={args.urv_c}°C  "
         f"demo={args.demo}",
         flush=True,
@@ -240,17 +240,17 @@ async def run_server(args: argparse.Namespace) -> None:
 
 
 def parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="DCS Raspberry Pi ADS1115 / Rosemount service")
-    p.add_argument("--host", default=os.environ.get("DCS_WS_HOST", "0.0.0.0"))
-    p.add_argument("--port", type=int, default=env_int("DCS_WS_PORT", 8765))
-    p.add_argument("--i2c-bus", type=int, default=env_int("DCS_I2C_BUS", 1))
-    p.add_argument("--ads-addr", type=int, default=env_int("DCS_ADS_ADDR", 0x48))
-    p.add_argument("--channel", type=int, default=env_int("DCS_ADC_CHANNEL", 0))
-    p.add_argument("--shunt-ohms", type=float, default=env_float("DCS_SHUNT_OHMS", 250.0))
-    p.add_argument("--lrv-c", type=float, default=env_float("DCS_LRV_C", 0.0))
-    p.add_argument("--urv-c", type=float, default=env_float("DCS_URV_C", 100.0))
-    p.add_argument("--pump-gpio", type=int, default=env_int("DCS_PUMP_GPIO", 17))
-    p.add_argument("--sample-hz", type=float, default=env_float("DCS_SAMPLE_HZ", 2.0))
+    p = argparse.ArgumentParser(description="Loop Monitor Raspberry Pi ADS1115 / Rosemount service")
+    p.add_argument("--host", default=os.environ.get("LOOP_MONITOR_WS_HOST", "0.0.0.0"))
+    p.add_argument("--port", type=int, default=env_int("LOOP_MONITOR_WS_PORT", 8765))
+    p.add_argument("--i2c-bus", type=int, default=env_int("LOOP_MONITOR_I2C_BUS", 1))
+    p.add_argument("--ads-addr", type=int, default=env_int("LOOP_MONITOR_ADS_ADDR", 0x48))
+    p.add_argument("--channel", type=int, default=env_int("LOOP_MONITOR_ADC_CHANNEL", 0))
+    p.add_argument("--shunt-ohms", type=float, default=env_float("LOOP_MONITOR_SHUNT_OHMS", 250.0))
+    p.add_argument("--lrv-c", type=float, default=env_float("LOOP_MONITOR_LRV_C", 0.0))
+    p.add_argument("--urv-c", type=float, default=env_float("LOOP_MONITOR_URV_C", 100.0))
+    p.add_argument("--pump-gpio", type=int, default=env_int("LOOP_MONITOR_PUMP_GPIO", 17))
+    p.add_argument("--sample-hz", type=float, default=env_float("LOOP_MONITOR_SAMPLE_HZ", 2.0))
     p.add_argument("--demo", action="store_true", help="Simulate ADS1115 without hardware")
     return p.parse_args(argv)
 

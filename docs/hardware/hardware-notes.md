@@ -1,6 +1,6 @@
-# Hardware notes — DCS
+# Hardware notes — Loop Monitor
 
-Revision **C** · 2026-09-27 · companions: `schematic-blocks.svg` / `.pdf` (**SCH-DCS-003** rev H, preferred human-readable), `schematic-overview.pdf` (SCH-DCS-001), `pinout.pdf` (SCH-DCS-002)
+Revision **C** · 2026-09-27 · companions: `schematic-blocks.svg` / `.pdf` (**SCH-LM-003** rev H, preferred human-readable), `schematic-overview.pdf` (SCH-LM-001), `pinout.pdf` (SCH-LM-002)
 
 Open the **SVG/PDF** drawings in this folder (GitHub does not always inline PDF).
 
@@ -22,10 +22,10 @@ Rosemount TT (4–20 mA)
     → ADS1115 AIN0 @ 5 V
     → I²C via 4-ch bi-directional level shifter
     → Raspberry Pi 4 (GPIO2/SDA, GPIO3/SCL, addr 0x48)
-    → raspberry-pi/dcs_server.py
+    → raspberry-pi/loop_monitor_server.py
          ├─ terminal printout (V / I / %Span)
          └─ WebSocket ws://<pi-ip>:8765
-              → desktop-app (DCS)
+              → desktop-app (Loop Monitor)
 ```
 
 Shunt confirmation from terminal: `V≈2.00 @ I≈8.02 mA` ⇒ **R≈250 Ω**.
@@ -36,7 +36,7 @@ Shunt confirmation from terminal: `V≈2.00 @ I≈8.02 mA` ⇒ **R≈250 Ω**.
 
 | Part | Role |
 |---|---|
-| Raspberry Pi 4 Model B | Runs `dcs_server.py` |
+| Raspberry Pi 4 Model B | Runs `loop_monitor_server.py` |
 | Green GPIO screw-terminal breakout | Wiring from Pi header |
 | Green perfboard HAT + standoffs | Carries level shifter / ADC interconnect |
 | Blue 4 Bi-Directional Level Shifters | 5 V ADS ↔ 3.3 V Pi I²C |
@@ -65,9 +65,9 @@ ADS1115 **VDD = 5 V**, **ADDR → GND** ⇒ **0x48**. Software PGA ±6.144 V.
 
 ## Calibration
 
-- 4 mA → **0 °C** (`DCS_LRV_C`)
-- 20 mA → **100 °C** (`DCS_URV_C`)
-- Shunt **250 Ω** (`DCS_SHUNT_OHMS`)
+- 4 mA → **0 °C** (`LOOP_MONITOR_LRV_C`)
+- 20 mA → **100 °C** (`LOOP_MONITOR_URV_C`)
+- Shunt **250 Ω** (`LOOP_MONITOR_SHUNT_OHMS`)
 
 ## WebSocket note
 
@@ -83,6 +83,6 @@ Star the 24 V return with ADC/Pi GND at the **shunt low** / brass bar. Do not in
 sudo raspi-config   # Interface Options → I2C → Enable
 sudo i2cdetect -y 1 # expect 0x48
 cd raspberry-pi
-python3 dcs_server.py
+python3 loop_monitor_server.py
 # Expect: V=… V  I=… mA  %Span=…%  TT=… °C
 ```

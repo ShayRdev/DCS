@@ -10,7 +10,7 @@ function createWindow() {
     minWidth: 960,
     minHeight: 640,
     backgroundColor: '#0e1114',
-    title: 'DCS',
+    title: 'Loop Monitor',
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -18,7 +18,7 @@ function createWindow() {
   });
 
   if (isDev) {
-    win.loadURL(process.env.DCS_DEV_URL || 'http://127.0.0.1:3000');
+    win.loadURL(process.env.LOOP_MONITOR_DEV_URL || 'http://127.0.0.1:3000');
   } else {
     win.loadFile(path.join(__dirname, '..', 'build', 'index.html'));
   }

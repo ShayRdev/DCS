@@ -1,0 +1,17 @@
+[Unit]
+Description=Loop Monitor Raspberry Pi ADS1115 / Rosemount WebSocket service
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/pi/loop-monitor/raspberry-pi
+ExecStart=/home/pi/loop-monitor/raspberry-pi/.venv/bin/python /home/pi/loop-monitor/raspberry-pi/loop_monitor_server.py
+Restart=on-failure
+RestartSec=3
+Environment=LOOP_MONITOR_WS_PORT=8765
+Environment=LOOP_MONITOR_SHUNT_OHMS=250
+Environment=LOOP_MONITOR_LRV_C=0
+Environment=LOOP_MONITOR_URV_C=100
+
+[Install]
+WantedBy=multi-user.target

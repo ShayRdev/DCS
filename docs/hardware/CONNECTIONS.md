@@ -1,11 +1,11 @@
-# DCS — Wire-level connections
+# Loop Monitor — Wire-level connections
 
 **Revision:** E · **Date:** 2026-09-28  
 **Audience:** Bench wiring and the human-readable schematic (`schematic-blocks.svg` / `.pdf`). This file is the **netlist truth** in Markdown.
 
-**Project one-liner:** Raspberry Pi 4 reads a Rosemount 2-wire 4–20 mA temperature transmitter through a **250 Ω** shunt into an **ADS1115** (5 V), with I²C crossing a blue **4 Bi-Directional Level Shifters** module on a green perfboard HAT; `dcs_server.py` prints `V` / `I` / `%Span` and serves WebSocket `:8765` to the desktop app.
+**Project one-liner:** Raspberry Pi 4 reads a Rosemount 2-wire 4–20 mA temperature transmitter through a **250 Ω** shunt into an **ADS1115** (5 V), with I²C crossing a blue **4 Bi-Directional Level Shifters** module on a green perfboard HAT; `loop_monitor_server.py` prints `V` / `I` / `%Span` and serves WebSocket `:8765` to the desktop app.
 
-**Sources (confirmed):** `raspberry-pi/ads1115.py`, `raspberry-pi/dcs_server.py`, `raspberry-pi/rosemount.py`, `docs/hardware/hardware-notes.md`, `README.md`, bench photos under `docs/images/` and `/cursor/stores/self/media/bench/`.
+**Sources (confirmed):** `raspberry-pi/ads1115.py`, `raspberry-pi/loop_monitor_server.py`, `raspberry-pi/rosemount.py`, `docs/hardware/hardware-notes.md`, `README.md`, bench photos under `docs/images/` and `/cursor/stores/self/media/bench/`.
 
 **Non-goals**
 - WebSocket / Electron UI are **software-only** — do **not** draw them as electrical nets.
@@ -108,9 +108,9 @@ Ref designators are logical (`U_PI`, `U_LLC`, …), logical names (map to schema
 | `U_PI` header **pin 5** `GPIO3` / `SCL` | `U_LLC` `A2` | `I2C_SCL_3V3` | |
 | `U_LLC` `B1` | `U_ADS` `SDA` | `I2C_SDA_5V` | HV side |
 | `U_LLC` `B2` | `U_ADS` `SCL` | `I2C_SCL_5V` | HV side |
-| `U_ADS` `ADDR` | `GND` | `GND` | ⇒ I²C address **0x48** (`ads1115.py`, `DCS_ADS_ADDR`) |
+| `U_ADS` `ADDR` | `GND` | `GND` | ⇒ I²C address **0x48** (`ads1115.py`, `LOOP_MONITOR_ADS_ADDR`) |
 | `U_ADS` `GND` | `GND` | `GND` | |
-| `U_ADS` `AIN0` | `NET_SHUNT_HIGH` | `NET_SHUNT_HIGH` | Channel **0** (`DCS_ADC_CHANNEL=0`) |
+| `U_ADS` `AIN0` | `NET_SHUNT_HIGH` | `NET_SHUNT_HIGH` | Channel **0** (`LOOP_MONITOR_ADC_CHANNEL=0`) |
 | `U_LLC` `A3`,`A4`,`B3`,`B4` | — | — | **Unused** on documented build. Optionally NC or tie unused to GND — `TODO / unverified` whether tied on bench |
 | `U_ADS` `AIN1`,`AIN2`,`AIN3` | — | — | Unused. Optional tie to `GND` — `TODO / unverified` |
 
@@ -118,7 +118,7 @@ Ref designators are logical (`U_PI`, `U_LLC`, …), logical names (map to schema
 
 | From | To | Net | Notes |
 |---|---|---|---|
-| `U_PI` header **pin 11** `GPIO17` | Relay module `IN` | `RELAY_DRV` | `dcs_server.py` default `DCS_PUMP_GPIO=17`; active-low drive assumed for common relay boards |
+| `U_PI` header **pin 11** `GPIO17` | Relay module `IN` | `RELAY_DRV` | `loop_monitor_server.py` default `LOOP_MONITOR_PUMP_GPIO=17`; active-low drive assumed for common relay boards |
 | Relay coil / contact supply | — | — | **Not confirmed on wood-board photo** — mark entire relay path optional / `TODO / unverified` if drawing permanent field IO |
 
 ### 3.5 GPIO screw TB + perfboard HAT (physical path)
@@ -152,7 +152,7 @@ Exact perfboard hole coordinates / which ADS breakout footprint: **`TODO / unver
 | 11 | `GPIO17` | Out | `RELAY_DRV` | Software yes; hardware optional |
 | Others | — | — | — | Not used by this design |
 
-**Code:** I²C bus `1`, address `0x48`, channel `0` — `dcs_server.py` / `ads1115.py`.
+**Code:** I²C bus `1`, address `0x48`, channel `0` — `loop_monitor_server.py` / `ads1115.py`.
 
 ### 4.2 `U_LLC` — Blue “4 Bi-Directional Level Shifters” module
 
@@ -207,7 +207,7 @@ Photo silkscreen (confirmed):
 
 | Spec | Value | Source |
 |---|---|---|
-| Resistance | **250 Ω** | Terminal math + docs (default `DCS_SHUNT_OHMS=250`) |
+| Resistance | **250 Ω** | Terminal math + docs (default `LOOP_MONITOR_SHUNT_OHMS=250`) |
 | Tolerance | ±0.1% | Documented target |
 | Power | ≥ (0.02 A)² × 250 ≈ 0.1 W → use ≥¼ W | Derived |
 
@@ -290,7 +290,7 @@ V = I \times R,\quad R = 250\ \Omega
 T = \mathrm{LRV} + \frac{I_{\mathrm{mA}} - 4}{16}(\mathrm{URV} - \mathrm{LRV})
 \]
 
-**Terminal line format** (`dcs_server.py`):
+**Terminal line format** (`loop_monitor_server.py`):
 
 ```text
 V=2.000 V  I=8.00 mA  %Span=25.0%  TT=25.00 °C  pump=off
@@ -351,7 +351,7 @@ Must exist as named nets:
 
 ## 9. Software-only (do not schematic)
 
-- `dcs_server.py` WebSocket `ws://0.0.0.0:8765`
+- `loop_monitor_server.py` WebSocket `ws://0.0.0.0:8765`
 - Electron / React desktop app
 - Simulator (`simulator/simulator.js`)
 

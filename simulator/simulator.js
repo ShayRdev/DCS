@@ -1,15 +1,15 @@
 /**
- * Desktop / CI simulator that mimics raspberry-pi/dcs_server.py
+ * Desktop / CI simulator that mimics raspberry-pi/loop_monitor_server.py
  * Protocol: JSON readings on ws://localhost:8765
  *
  *   npm install && npm start
  */
 const WebSocket = require('ws');
 
-const PORT = Number(process.env.DCS_WS_PORT || 8765);
-const SHUNT = Number(process.env.DCS_SHUNT_OHMS || 250);
-const LRV = Number(process.env.DCS_LRV_C || 0);
-const URV = Number(process.env.DCS_URV_C || 100);
+const PORT = Number(process.env.LOOP_MONITOR_WS_PORT || 8765);
+const SHUNT = Number(process.env.LOOP_MONITOR_SHUNT_OHMS || 250);
+const LRV = Number(process.env.LOOP_MONITOR_LRV_C || 0);
+const URV = Number(process.env.LOOP_MONITOR_URV_C || 100);
 
 const wss = new WebSocket.Server({ port: PORT, host: '0.0.0.0' });
 console.log(`Simulator (Rosemount/ADS1115 protocol) on ws://localhost:${PORT}`);

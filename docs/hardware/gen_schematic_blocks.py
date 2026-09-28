@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate SCH-DCS-003 Rev H — polished IEEE/IEC electrical schematic (no KiCad)."""
+"""Generate SCH-LM-003 Rev H — polished IEEE/IEC electrical schematic (no KiCad)."""
 
 from __future__ import annotations
 
@@ -35,7 +35,7 @@ def build_svg() -> str:
     L(
         f'''<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}">
-<title>DCS SCH-DCS-003 Rev H</title>
+<title>Loop Monitor SCH-LM-003 Rev H</title>
 <desc>Electrical schematic from CONNECTIONS.md rev E. F1 in +24 feed.</desc>
 <defs>
 <style><![CDATA[
@@ -72,9 +72,9 @@ def build_svg() -> str:
     L(f'<rect class="bg" width="{W}" height="{H}"/>')
     L(f'<rect class="frame" x="14" y="14" width="{W-28}" height="{H-28}"/>')
     L(f'<rect class="sheet" x="22" y="22" width="{W-44}" height="{H-44}"/>')
-    L('<text class="hdr" x="36" y="44">DCS process loop &amp; ADC interface</text>')
+    L('<text class="hdr" x="36" y="44">Loop Monitor process loop &amp; ADC interface</text>')
     L(
-        '<text class="note" x="36" y="57">CONNECTIONS.md rev E · SCH-DCS-003 rev H · unused pins omitted · F1 amp rating TBD</text>'
+        '<text class="note" x="36" y="57">CONNECTIONS.md rev E · SCH-LM-003 rev H · unused pins omitted · F1 amp rating TBD</text>'
     )
 
     # ---------- PS1 ----------
@@ -338,9 +338,9 @@ def build_svg() -> str:
   <line class="w" x1="{tbx}" y1="{tby+110}" x2="{tbx+360}" y2="{tby+110}"/>
   <line class="w" x1="{tbx+170}" y1="{tby+52}" x2="{tbx+170}" y2="{tby+140}"/>
   <line class="w" x1="{tbx+255}" y1="{tby+52}" x2="{tbx+255}" y2="{tby+140}"/>
-  <text class="tbb" x="{tbx+8}" y="{tby+17}">DCS — Distributed Control System (bench)</text>
+  <text class="tbb" x="{tbx+8}" y="{tby+17}">Loop Monitor (bench)</text>
   <text class="tb" x="{tbx+8}" y="{tby+42}">PS1 · F1 · loop · 250R · ADS1115 · LLC · Pi 4</text>
-  <text class="tbb" x="{tbx+8}" y="{tby+72}">SCH-DCS-003</text>
+  <text class="tbb" x="{tbx+8}" y="{tby+72}">SCH-LM-003</text>
   <text class="tbb" x="{tbx+178}" y="{tby+72}">REV H</text>
   <text class="tb" x="{tbx+263}" y="{tby+72}">1 / 1</text>
   <text class="tb" x="{tbx+8}" y="{tby+100}">2026-09-28</text>

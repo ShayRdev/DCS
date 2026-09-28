@@ -1,4 +1,4 @@
-# DCS — Desktop Control System
+# Loop Monitor
 
 Personal portfolio project: a **Raspberry Pi 4** reads a **Rosemount temperature transmitter** through an **ADS1115** (I²C, via a blue 4-channel level shifter on a green perfboard HAT), prints live values in the terminal, and streams them to an **Electron** desktop app over the LAN.
 
@@ -10,9 +10,9 @@ Built and verified on real hardware. Bench terminal math shows a **250 Ω** shun
 
 Live Rosemount TT-103 readout (demo / simulator link) and pump control:
 
-![DCS dashboard — live temperature and terminal readout](docs/images/dcs_dashboard_live.png)
+![Loop Monitor dashboard — live temperature and terminal readout](docs/images/loop_monitor_dashboard_live.png)
 
-![DCS dashboard — pump running](docs/images/dcs_dashboard_pump_on.png)
+![Loop Monitor dashboard — pump running](docs/images/loop_monitor_dashboard_pump_on.png)
 
 ---
 
@@ -43,7 +43,7 @@ Blue level-shifter module on the green perfboard:
 | Signal | Source | Path |
 |---|---|---|
 | Process temperature (°C) | Rosemount 2-wire transmitter | 4–20 mA → **250 Ω** shunt → ADS1115 AIN0 → Pi |
-| Loop current (mA) / shunt voltage (V) / % span | Same ADC sample | Converted in `raspberry-pi/dcs_server.py` |
+| Loop current (mA) / shunt voltage (V) / % span | Same ADC sample | Converted in `raspberry-pi/loop_monitor_server.py` |
 
 Default scale: **4 mA → 0 °C**, **20 mA → 100 °C** (match your transmitter’s LRV/URV).  
 Shunt: **250 Ω** → **1.0 V @ 4 mA**, **5.0 V @ 20 mA** (ADS at 5 V; I²C level-shifted to the Pi).
@@ -65,7 +65,7 @@ V=3.002 V  I=12.03 mA  %Span=50.2%
                          I²C via 4-ch level shifter
                                     |
                             [ Raspberry Pi 4 ]
-                            dcs_server.py
+                            loop_monitor_server.py
                                |      |
                           terminal   WebSocket :8765
                                          |
@@ -73,7 +73,7 @@ V=3.002 V  I=12.03 mA  %Span=50.2%
                                       Electron
 ```
 
-- **On the Pi:** `python3 dcs_server.py` samples the ADS1115, prints `V` / `I` / `%Span` (and TT) to the terminal, and serves `ws://0.0.0.0:8765`.
+- **On the Pi:** `python3 loop_monitor_server.py` samples the ADS1115, prints `V` / `I` / `%Span` (and TT) to the terminal, and serves `ws://0.0.0.0:8765`.
 - **On the desktop:** the Electron app connects to `ws://<pi-ip>:8765`, shows TT-103, loop current, shunt voltage, and a scrolling terminal-style log.
 - **Without hardware:** run `simulator/` on your laptop — same JSON protocol — and point the app at `ws://127.0.0.1:8765`.
 
@@ -101,7 +101,7 @@ Optional pump commands (GPIO 17 relay): `{"command":"pump","state":"on"}`.
 ## Repository layout
 
 ```
-DCS/
+loop-monitor/
 ├── desktop-app/          # Electron + React UI
 ├── raspberry-pi/         # ADS1115 reader + WebSocket service
 ├── simulator/            # LAN-free stand-in for the Pi service
@@ -120,7 +120,7 @@ DCS/
 
 | Item | Link / notes | Role |
 |---|---|---|
-| Raspberry Pi 4 Model B | — | Runs `dcs_server.py` |
+| Raspberry Pi 4 Model B | — | Runs `loop_monitor_server.py` |
 | Green GPIO screw-terminal breakout on Pi header | (OONO-style TB still useful: [B084C69VSQ](https://www.amazon.com/dp/B084C69VSQ)) | Field wiring to the HAT |
 | Green perfboard HAT + standoffs | Hand-assembled | Carries level shifter + ADC interconnect |
 | Blue **4 Bi-Directional Level Shifters** module | On the perfboard | 5 V ADS1115 I²C ↔ Pi 3.3 V |
@@ -158,7 +158,7 @@ ADS1115 **VDD = 5 V** (not Pi 3V3). **ADDR → GND** ⇒ **0x48**.
 
 Left→right electrical drawing (portfolio). Open the SVG or PDF:
 
-- **[docs/hardware/schematic-blocks.svg](docs/hardware/schematic-blocks.svg)** — **SCH-DCS-003** rev **H** (IEEE/IEC symbols; **F1** PT 4-HESI in +24 feed)
+- **[docs/hardware/schematic-blocks.svg](docs/hardware/schematic-blocks.svg)** — **SCH-LM-003** rev **H** (IEEE/IEC symbols; **F1** PT 4-HESI in +24 feed)
 - **[docs/hardware/schematic-blocks.pdf](docs/hardware/schematic-blocks.pdf)** — same drawing as PDF
 - Older overview/pinout sheets (rev C): [schematic-overview.pdf](docs/hardware/schematic-overview.pdf) · [pinout.pdf](docs/hardware/pinout.pdf)
 - [docs/hardware/hardware-notes.md](docs/hardware/hardware-notes.md)
@@ -182,7 +182,7 @@ cd raspberry-pi
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-python3 dcs_server.py
+python3 loop_monitor_server.py
 ```
 
 You should see a live terminal stream like:
@@ -194,12 +194,12 @@ V=2.000 V  I=8.00 mA  %Span=25.0%  TT=25.00 °C  pump=off
 Demo without the ADS1115:
 
 ```bash
-python3 dcs_server.py --demo
+python3 loop_monitor_server.py --demo
 ```
 
-Optional systemd unit: `raspberry-pi/dcs.service` (edit paths for your Pi user).
+Optional systemd unit: `raspberry-pi/loop-monitor.service` (edit paths for your Pi user).
 
-Useful env vars: `DCS_WS_PORT`, `DCS_SHUNT_OHMS` (default **250**), `DCS_LRV_C`, `DCS_URV_C`, `DCS_ADS_ADDR`, `DCS_ADC_CHANNEL`.
+Useful env vars: `LOOP_MONITOR_WS_PORT`, `LOOP_MONITOR_SHUNT_OHMS` (default **250**), `LOOP_MONITOR_LRV_C`, `LOOP_MONITOR_URV_C`, `LOOP_MONITOR_ADS_ADDR`, `LOOP_MONITOR_ADC_CHANNEL`.
 
 ---
 

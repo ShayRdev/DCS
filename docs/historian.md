@@ -1,4 +1,4 @@
-# DCS project historian
+# Loop Monitor project historian
 
 Short log of what mattered on this repo. Personal portfolio build — no company branding.
 
@@ -13,12 +13,12 @@ Short log of what mattered on this repo. Personal portfolio build — no company
 
 | When | What |
 |------|------|
-| Early | Portfolio DCS: Pi + ADS1115 + Electron HMI; simulator for laptop demos |
+| Early | Portfolio Loop Monitor: Pi + ADS1115 + Electron HMI; simulator for laptop demos |
 | Docs pass | PDF pinout/overview sheets; Amazon BOM; README screenshots; WS reconnect polish |
 | Hardware truth | Shunt confirmed **250 Ω** (not 100 Ω) from terminal math; ADS @ 5 V + LLC |
 | Wire SoT | **`docs/hardware/CONNECTIONS.md`** written as Markdown netlist (rails, From/To, pin tables, TODOs) |
 | Schematic attempt | SKiDL / KiCad auto-layout tried for `.net` / `.kicad_sch` — **abandoned** (placement unusable for portfolio display) |
-| Schematic SoT | Hand-drawn **SCH-DCS-003** SVG/PDF (`schematic-blocks.*`) kept instead; rev through **H** |
+| Schematic SoT | Hand-drawn **SCH-LM-003** SVG/PDF (`schematic-blocks.*`) kept instead; rev through **H** |
 | Fuse | **F1** promoted from vague optional BOM line to confirmed series fuse in CONNECTIONS + drawing |
 | Cleanup | **Removed** `hardware/skidl/` and all KiCad/SKiDL tooling from the repo |
 

@@ -3,7 +3,7 @@ import Tank from './components/Tank';
 import Instrument from './components/Instrument';
 
 const DEFAULT_WS =
-  process.env.REACT_APP_DCS_WS_URL ||
+  process.env.REACT_APP_LOOP_MONITOR_WS_URL ||
   `ws://${window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? '127.0.0.1' : '192.168.1.125'}:8765`;
 
 const MAX_LOG = 40;
@@ -200,8 +200,8 @@ function Dashboard() {
     <div className="app-shell">
       <header className="topbar">
         <div className="brand">
-          <div className="brand-mark">DCS</div>
-          <div className="brand-sub">Desktop Control</div>
+          <div className="brand-mark">Loop Monitor</div>
+          <div className="brand-sub">Pi · 4–20 mA</div>
         </div>
         <div className="topbar-meta">
           <div
@@ -276,7 +276,7 @@ function Dashboard() {
 
           <p className="hint">
             Point the app at your Pi WebSocket (default <code>{DEFAULT_WS}</code>).
-            Override with <code>REACT_APP_DCS_WS_URL</code>.
+            Override with <code>REACT_APP_LOOP_MONITOR_WS_URL</code>.
             <br />
             <label htmlFor="ws-url" style={{ display: 'inline-block', marginTop: 8 }}>
               WS URL{' '}

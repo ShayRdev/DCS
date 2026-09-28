@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="1480" height="780" viewBox="0 0 1480 780">
-<title>DCS SCH-DCS-003 Rev H</title>
+<title>Loop Monitor SCH-LM-003 Rev H</title>
 <desc>Electrical schematic from CONNECTIONS.md rev E. F1 in +24 feed.</desc>
 <defs>
 <style><![CDATA[
@@ -35,8 +35,8 @@
 <rect class="bg" width="1480" height="780"/>
 <rect class="frame" x="14" y="14" width="1452" height="752"/>
 <rect class="sheet" x="22" y="22" width="1436" height="736"/>
-<text class="hdr" x="36" y="44">DCS process loop &amp; ADC interface</text>
-<text class="note" x="36" y="57">CONNECTIONS.md rev E · SCH-DCS-003 rev H · unused pins omitted · F1 amp rating TBD</text>
+<text class="hdr" x="36" y="44">Loop Monitor process loop &amp; ADC interface</text>
+<text class="note" x="36" y="57">CONNECTIONS.md rev E · SCH-LM-003 rev H · unused pins omitted · F1 amp rating TBD</text>
 <g id="PS1">
 <text class="ref" x="36" y="118">PS1</text>
 <text class="val" x="36" y="130">Mean Well 24V</text>
@@ -236,9 +236,9 @@
   <line class="w" x1="1080" y1="600" x2="1440" y2="600"/>
   <line class="w" x1="1250" y1="542" x2="1250" y2="630"/>
   <line class="w" x1="1335" y1="542" x2="1335" y2="630"/>
-  <text class="tbb" x="1088" y="507">DCS — Distributed Control System (bench)</text>
+  <text class="tbb" x="1088" y="507">Loop Monitor (bench)</text>
   <text class="tb" x="1088" y="532">PS1 · F1 · loop · 250R · ADS1115 · LLC · Pi 4</text>
-  <text class="tbb" x="1088" y="562">SCH-DCS-003</text>
+  <text class="tbb" x="1088" y="562">SCH-LM-003</text>
   <text class="tbb" x="1258" y="562">REV H</text>
   <text class="tb" x="1343" y="562">1 / 1</text>
   <text class="tb" x="1088" y="590">2026-09-28</text>
